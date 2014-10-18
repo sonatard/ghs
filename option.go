@@ -25,7 +25,7 @@ func GhsOptionParser() (string, string, string) {
 		fmt.Printf("\n")
 		fmt.Printf("Github search APIv3 QUERY infomation:\n")
 		fmt.Printf("   https://developer.github.com/v3/search/\n")
-		fmt.Printf("   https://help.github.com/articles/searching-repositories/#search-based-on-the-main-language-of-a-repository\n")
+		fmt.Printf("   https://help.github.com/articles/searching-repositories/\n")
 		os.Exit(1)
 	}
 

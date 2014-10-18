@@ -19,7 +19,7 @@ Help Options:
 
 Github search APIv3 QUERY infomation:
    https://developer.github.com/v3/search/
-   https://help.github.com/articles/searching-repositories/#search-based-on-the-main-language-of-a-repository
+   https://help.github.com/articles/searching-repositories/
 ```
 
 Exapmle
