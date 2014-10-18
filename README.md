@@ -56,8 +56,11 @@ function gpi () {
 
 gpi usage
 ===========
+1. exec gpi QUERY
 ![1](http://f.st-hatena.com/images/fotolife/s/sona-zip/20141018/20141018194948_original.png?1413630026)
+2. filtering by peco
 ![ghsWithghq](http://f.st-hatena.com/images/fotolife/s/sona-zip/20141018/20141018194949_original.gif?1413630039)
+3. clone repository by ghq
 ![ghqimport](http://f.st-hatena.com/images/fotolife/s/sona-zip/20141018/20141018194950_original.png)
 
 more
