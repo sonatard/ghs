@@ -40,7 +40,7 @@ JeroenDeDauw/GitHub
 With [motemen/ghq](https://github.com/motemen/ghq)
 ===========
 ```sh
-ghs  | peco | awk '{print $1}' | ghq import
+ghs QUERY | peco | awk '{print $1}' | ghq import
 
 ```
 
