@@ -67,7 +67,7 @@ more
 ===========
 ```zsh
 function gpr () {
-  ghq list --full-path | peco | awk '{print $1}' | rm -r
+  ghq list --full-path | peco | xargs rm -r
 }
 ```
 
