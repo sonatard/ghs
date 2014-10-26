@@ -5,7 +5,7 @@ import (
 	"github.com/google/go-github/github"
 )
 
-func NewRepositoryBySearch(sort string, order string, query string) []github.Repository {
+func SearchRepository(sort string, order string, query string) []github.Repository {
 	client := github.NewClient(nil)
 	searchOpts := &github.SearchOptions{
 		Sort:  sort,
@@ -22,7 +22,7 @@ func NewRepositoryBySearch(sort string, order string, query string) []github.Rep
 	return searchResult.Repositories
 }
 
-func Print(repos []github.Repository) {
+func PrintRepository(repos []github.Repository) {
 	for _, repo := range repos {
 		if repo.FullName != nil {
 			fmt.Printf("%-40v", *repo.FullName)

@@ -8,31 +8,54 @@ import (
 )
 
 type GhsOptions struct {
-	Sort  string `short:"s" long:"sort"  description:" The sort field. 'stars', 'forks', or 'updated'." default:"best match"`
-	Order string `short:"o" long:"order" description:" The sort order. 'asc' or 'desc'." default:"desc"`
+	Sort    string `short:"s"  long:"sort"        description:"The sort field. 'stars', 'forks', or 'updated'." default:"best match"`
+	Order   string `short:"o"  long:"order"       description:"The sort order. 'asc' or 'desc'." default:"desc"`
+	Version bool   `short:"v"  long:"version"     description:"print version infomation and exit."`
 }
 
-func GhsOptionParser() (string, string, string) {
+func GhsOptionParser() ([]string, GhsOptions) {
 	var opts GhsOptions
 	parser := flags.NewParser(&opts, flags.HelpFlag)
 
 	parser.Name = "ghs"
-	parser.Usage = "[OPTION] \"QUERY\"(The search keywords, as well as any qualifiers.)"
+	parser.Usage = "[OPTION] \"QUERY\""
 	args, err := parser.Parse()
 
-	if len(args) != 1 || err != nil {
-		parser.WriteHelp(os.Stdout)
-		fmt.Printf("\n")
-		fmt.Printf("Github search APIv3 QUERY infomation:\n")
-		fmt.Printf("   https://developer.github.com/v3/search/\n")
-		fmt.Printf("   https://help.github.com/articles/searching-repositories/\n")
+	printGhsOption(args, opts)
+
+	if err != nil {
+		printGhsHelp(parser)
 		os.Exit(1)
 	}
 
-	query := args[0]
+	if opts.Version {
+		fmt.Printf("ghs %s\n", version)
+		os.Exit(0)
+	}
+
+	if len(args) != 1 {
+		printGhsHelp(parser)
+		os.Exit(1)
+	}
+	return args, opts
+}
+
+func printGhsOption(args []string, opts GhsOptions) {
+	debug.Printf("args = %v\n", args)
+
 	debug.Printf("cmd option sort = %s\n", opts.Sort)
 	debug.Printf("cmd option order = %s\n", opts.Order)
-	debug.Printf("cmd args query = %s\n", query)
 
-	return opts.Sort, opts.Order, query
+	debug.Printf("cmd option Version = %s\n", opts.Version)
+}
+
+func printGhsHelp(parser *flags.Parser) {
+	parser.WriteHelp(os.Stdout)
+	fmt.Printf("\n")
+	fmt.Printf("Github search APIv3 QUERY infomation:\n")
+	fmt.Printf("   https://developer.github.com/v3/search/\n")
+	fmt.Printf("   https://help.github.com/articles/searching-repositories/\n")
+	fmt.Printf("\n")
+	fmt.Printf("Version:\n")
+	fmt.Printf("   ghs %s\n", version)
 }

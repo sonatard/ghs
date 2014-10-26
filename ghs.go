@@ -3,7 +3,7 @@ package main
 var version = "0.0.1"
 
 func main() {
-	sort, order, query := GhsOptionParser()
-	repos := NewRepositoryBySearch(sort, order, query)
-	Print(repos)
+	args, opts := GhsOptionParser()
+	repos := SearchRepository(opts.Sort, opts.Order, args[0])
+	PrintRepository(repos)
 }
