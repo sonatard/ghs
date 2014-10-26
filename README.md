@@ -8,21 +8,28 @@ ghs usage
 ```sh
 [sona ~]$ ghs --help
 Usage:
-  ghs [OPTION] "QUERY"(The search keywords, as well as any qualifiers.)
+  ghs [OPTION] "QUERY"
 
 Application Options:
-  -s, --sort=  The sort field. 'stars', 'forks', or 'updated'. (best match)
-  -o, --order= The sort order. 'asc' or 'desc'. (desc)
+  -s, --sort=     The sort field. 'stars', 'forks', or 'updated'. (best match)
+  -o, --order=    The sort order. 'asc' or 'desc'. (desc)
+  -l, --language= searches repositories based on the language they’re written in.
+  -u, --user=     limits searches to a specific user name.
+  -r, --repo=     limits searches to a specific repository.
+  -v, --version   print version infomation and exit.
 
 Help Options:
-  -h, --help   Show this help message
+  -h, --help      Show this help message
 
 Github search APIv3 QUERY infomation:
    https://developer.github.com/v3/search/
    https://help.github.com/articles/searching-repositories/
+
+Version:
+   ghs 0.0.2
 ```
 
-Exapmle
+Example
 ===========
 ```sh
 [sona ~]$ ghs github
@@ -74,4 +81,3 @@ function gpr () {
 ```sh
 gpr
 ```
-
