@@ -38,13 +38,15 @@
 #             ├── ghs.exe
 #             └── README.md
 
+repo_root=$(pwd)
+
 XC_VERSION=$1
 [ -z "${XC_VERSION}" ] && echo "usage : create_pkg.sh <version>" && exit 1
 
 XC_ARCH=${XC_ARCH:-386 amd64}
 XC_OS=${XC_OS:-linux darwin windows}
 
-work_dir=./pkg/work/${XC_VERSION}
+work_dir=${repo_root}/pkg/work/${XC_VERSION}
 rm -rf pkg/
 gox \
     -os="${XC_OS}" \
@@ -53,19 +55,17 @@ gox \
 
 
 
-targets=$(ls ${work_dir})
-
-archive_dir=./pkg/archive/${XC_VERSION}
+archive_dir=${repo_root}/pkg/archive/${XC_VERSION}
 mkdir -p ${work_dir} ${archive_dir}
 
-for target in ${targets};
+cd ${work_dir}
+for target in *;
 do
-    target_dir=${work_dir}/${target}
-    cp README.md ${target_dir}
-    cp CHANGES   ${target_dir}
+    cp ${repo_root}/README.md ${target}
+    cp ${repo_root}/CHANGES   ${target}
     if [ $(echo $target | grep linux) ]; then
-        tar zcvf ${archive_dir}/${target}.tar.gz ${target_dir}
+        tar zcvf ${archive_dir}/${target}.tar.gz ${target}
     else
-        zip -r ${archive_dir}/${target}.zip ${target_dir}
+        zip -r ${archive_dir}/${target}.zip ${target}
     fi
 done
