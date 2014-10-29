@@ -3,8 +3,11 @@ ghs
 
 `ghs` - command-line utility for searching Github repositoy.
 
-ghs usage
+![](http://f.st-hatena.com/images/fotolife/s/sona-zip/20141029/20141029212146_original.gif?1414585446)
+
+ghs options
 ===========
+
 ```sh
 [sona ~]$ ghs --help
 Usage:
@@ -29,31 +32,46 @@ Version:
    ghs 0.0.2
 ```
 
-Example
+Install
 ===========
-```sh
-[sona ~]$ ghs github
-michael/github                          A higher-level wrapper around the Github API. Intended for the browser.
-peter-murach/github                     Ruby interface to github API v3
-jwiegley/github                         The github API for Haskell
-isaacs/github                           Just a place to track issues and feature requests that I have for github
-gulinghao1847/github
-chscodecamp/github                      GitHub Seminar
-opauth/github                           GitHub authentication strategy for Opauth
-Kdyby/Github                            Github API client with authorization for Nette Framework
-JeroenDeDauw/GitHub
+
+[Releases · sona-tar/ghs](https://github.com/sona-tar/ghs/releases)
+
+or
+
+```zsh
+go get github.com/sona-tar/ghs
 ```
 
-With [motemen/ghq](https://github.com/motemen/ghq)
+Usage
 ===========
+
+basic usage.
+default search target.(name, description and readme)
+```zsh
+ghs "dotfiles"
+```
+
+You can restrict the search to just the repository name.
+```zsh
+ghs "dotfiles in:name"
+```
+
+Limits searches to a specific user.
+```zsh
+ghs "dotfiles in:name" -u sona-tar
+sona-tar/dotfiles                       dotfiles
+```
+
+With [motemen/ghq](https://github.com/motemen/ghq) and [peco/peco](https://github.com/peco/peco)
+===========
+
 ```sh
 ghs QUERY | peco | awk '{print $1}' | ghq import
-
 ```
 
+crate zsh function
 
-Zsh function
-===========
 ```zsh
 function gpi () {
   [ "$#" -eq 0 ] && echo "Usage : gpi QUERY" && return 1
@@ -62,16 +80,15 @@ function gpi () {
 ```
 
 gpi usage
-===========
 1. exec gpi QUERY
-![1](http://f.st-hatena.com/images/fotolife/s/sona-zip/20141018/20141018194948_original.png?1413630026)
 2. filtering by peco
-![ghsWithghq](http://f.st-hatena.com/images/fotolife/s/sona-zip/20141018/20141018194949_original.gif?1413630039)
 3. clone repository by ghq
-![ghqimport](http://f.st-hatena.com/images/fotolife/s/sona-zip/20141018/20141018194950_original.png)
+
+![](http://f.st-hatena.com/images/fotolife/s/sona-zip/20141029/20141029210952_original.gif?1414584687)
 
 more
 ===========
+
 ```zsh
 function gpr () {
   ghq list --full-path | peco | xargs rm -r
@@ -81,3 +98,10 @@ function gpr () {
 ```sh
 gpr
 ```
+
+
+Author
+===========
+
+[sona-tar (sona_tar)](https://github.com/sona-tar)
+
