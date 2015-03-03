@@ -36,11 +36,6 @@ func GhsOptionParser() ([]string, GhsOptions) {
 		os.Exit(0)
 	}
 
-	if len(args) != 1 {
-		printGhsHelp(parser)
-		os.Exit(1)
-	}
-
 	return args, opts
 }
 

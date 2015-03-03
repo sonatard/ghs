@@ -4,8 +4,12 @@ var version = "0.0.2"
 
 func main() {
 	args, opts := GhsOptionParser()
+	query := ""
 
-	query := args[0]
+	for _, arg := range args {
+		query += arg
+	}
+
 	if opts.Language != "" {
 		query += " language:" + opts.Language
 	}
