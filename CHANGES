@@ -1,8 +1,12 @@
 CHANGES
 =======
 
+0.0.3 - Mar 03 2015
+  * Fix bug repository full name overwrap description
+  * Enable to run -u or -r without args
+
 0.0.2 - Oct 26 2014
-  * Support --language, --user, --repo options. 
+  * Support --language, --user and --repo options
 
 0.0.1 - Oct 26 2014
   * Initial versioned release

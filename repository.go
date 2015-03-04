@@ -16,7 +16,7 @@ func SearchRepository(sort string, order string, query string) []github.Reposito
 
 	searchResult, _, err := client.Search.Repositories(query, searchOpts)
 	if err != nil {
-		fmt.Printf("repository search error")
+		fmt.Printf("Repository not Found\n")
 	}
 
 	return searchResult.Repositories
