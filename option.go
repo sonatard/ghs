@@ -27,8 +27,7 @@ func GhsOptionParser() ([]string, GhsOptions) {
 	printGhsOption(args, opts)
 
 	if err != nil {
-		printGhsHelp(parser)
-		os.Exit(1)
+		ghsOptionError(parser)
 	}
 
 	if opts.Version {
@@ -36,7 +35,16 @@ func GhsOptionParser() ([]string, GhsOptions) {
 		os.Exit(0)
 	}
 
+	if (opts.User == "" && opts.Repository == "") && len(args) == 0 {
+		ghsOptionError(parser)
+	}
+
 	return args, opts
+}
+
+func ghsOptionError(parser *flags.Parser) {
+	printGhsHelp(parser)
+	os.Exit(1)
 }
 
 func printGhsOption(args []string, opts GhsOptions) {
