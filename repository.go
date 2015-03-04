@@ -23,20 +23,23 @@ func SearchRepository(sort string, order string, query string) []github.Reposito
 }
 
 func PrintRepository(repos []github.Repository) {
-	max_len := 0
+	repoNameMaxLen := 0
 	for _, repo := range repos {
-		len := len(*repo.FullName)
-		if len > max_len {
-			max_len = len
+		repoNamelen := len(*repo.FullName)
+		if repoNamelen > repoNameMaxLen {
+			repoNameMaxLen = repoNamelen
 		}
 	}
 	for _, repo := range repos {
 		if repo.FullName != nil {
 			fmt.Printf("%v", *repo.FullName)
 		}
-		fmt.Printf(" ")
-		len := len(*repo.FullName)
-		for i := 0; i < max_len-len; i++ {
+
+		fmt.Printf("    ")
+
+		paddingLen := repoNameMaxLen - len(*repo.FullName)
+
+		for i := 0; i < paddingLen; i++ {
 			fmt.Printf(" ")
 		}
 
