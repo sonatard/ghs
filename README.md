@@ -14,12 +14,13 @@ Usage:
   ghs [OPTION] "QUERY"
 
 Application Options:
-  -s, --sort=     The sort field. 'stars', 'forks', or 'updated'. (best match)
-  -o, --order=    The sort order. 'asc' or 'desc'. (desc)
-  -l, --language= searches repositories based on the language they’re written in.
-  -u, --user=     limits searches to a specific user name.
-  -r, --repo=     limits searches to a specific repository.
-  -v, --version   print version infomation and exit.
+  -s, --sort=       The sort field. 'stars', 'forks', or 'updated'. (best match)
+  -o, --order=      The sort order. 'asc' or 'desc'. (desc)
+  -l, --language=   searches repositories based on the language they’re written in.
+  -u, --user=       limits searches to a specific user name.
+  -r, --repo=       limits searches to a specific repository.
+  -v, --version     print version infomation and exit.
+  -e, --enterprise= search from github enterprise. set the API entry point of GHE.
 
 Help Options:
   -h, --help      Show this help message
