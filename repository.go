@@ -3,15 +3,25 @@ package main
 import (
 	"fmt"
 	"github.com/google/go-github/github"
+	"net/url"
 )
 
-func SearchRepository(sort string, order string, query string) []github.Repository {
+func SearchRepository(sort string, order string, query string, enterprise string) []github.Repository {
 	client := github.NewClient(nil)
 	searchOpts := &github.SearchOptions{
 		Sort:  sort,
 		Order: order,
 		// TextMatch: true,
 		// ListOptions: github.ListOptions{Page: 1, PerPage: 1},
+	}
+
+	if enterprise != "" {
+		baseURL, err := url.Parse(enterprise)
+		if err == nil {
+			client.BaseURL = baseURL
+		} else {
+			fmt.Printf("%s cannot parse\n", enterprise)
+		}
 	}
 
 	searchResult, _, err := client.Search.Repositories(query, searchOpts)

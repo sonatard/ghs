@@ -1,6 +1,6 @@
 package main
 
-var version = "0.0.3"
+var version = "0.0.4"
 
 func main() {
 	args, opts := GhsOptionParser()
@@ -20,6 +20,6 @@ func main() {
 		query += " repo:" + opts.Repository
 	}
 
-	repos := SearchRepository(opts.Sort, opts.Order, query)
+	repos := SearchRepository(opts.Sort, opts.Order, query, opts.Enterprise)
 	PrintRepository(repos)
 }
