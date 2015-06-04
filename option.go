@@ -69,5 +69,5 @@ func printGhsHelp(parser *flags.Parser) {
 	fmt.Printf("   https://help.github.com/articles/searching-repositories/\n")
 	fmt.Printf("\n")
 	fmt.Printf("Version:\n")
-	fmt.Printf("   ghs %s\n", version)
+	fmt.Printf("   ghs %s (https://github.com/sona-tar/ghs.git)\n", version)
 }
