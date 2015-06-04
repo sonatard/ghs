@@ -1,12 +1,15 @@
 CHANGES
 =======
+0.0.4 - Jun 04 2015
+  * [feature] Support Github Enterprise Option(-e, --enterprise). @kou-m
+  * [feature] Support go-latest. check version when ghs -h or -v
 
 0.0.3 - Mar 03 2015
-  * Fix bug repository full name overwrap description
-  * Enable to run -u or -r without args
+  * [fix] repository full name overwrap description
+  * [fix] Enable to run -u or -r without args
 
 0.0.2 - Oct 26 2014
-  * Support --language, --user and --repo options
+  * [feature] Support --language, --user and --repo options
 
 0.0.1 - Oct 26 2014
   * Initial versioned release

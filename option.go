@@ -14,7 +14,7 @@ type GhsOptions struct {
 	User       string `short:"u"  long:"user"       description:"limits searches to a specific user name."`
 	Repository string `short:"r"  long:"repo"       description:"limits searches to a specific repository."`
 	Version    bool   `short:"v"  long:"version"    description:"print version infomation and exit."`
-	Enterprise string `short:"e"  long:"enterprise" description:"search from github enterprise"`
+	Enterprise string `short:"e"  long:"enterprise" description:"search from github enterprise."`
 }
 
 func GhsOptionParser() ([]string, GhsOptions) {

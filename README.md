@@ -20,17 +20,17 @@ Application Options:
   -u, --user=       limits searches to a specific user name.
   -r, --repo=       limits searches to a specific repository.
   -v, --version     print version infomation and exit.
-  -e, --enterprise= search from github enterprise. set the API entry point of GHE.
+  -e, --enterprise= search from github enterprise.
 
 Help Options:
-  -h, --help      Show this help message
+  -h, --help        Show this help message
 
 Github search APIv3 QUERY infomation:
    https://developer.github.com/v3/search/
    https://help.github.com/articles/searching-repositories/
 
 Version:
-   ghs 0.0.2
+   ghs 0.0.4 (https://github.com/sona-tar/ghs.git)
 ```
 
 Install
@@ -83,6 +83,7 @@ function gpi () {
 ```
 
 gpi usage
+
 1. exec gpi QUERY
 2. filtering by peco
 3. clone repository by ghq
@@ -103,7 +104,13 @@ gpr
 ```
 
 
+Contributors
+===========
+
+[kou-m](https://github.com/kou-m)
+
+
 Author
 ===========
 
-[sona-tar (sona_tar)](https://github.com/sona-tar)
+[sona-tar](https://github.com/sona-tar)
