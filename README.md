@@ -36,13 +36,15 @@ Version:
 Install
 ===========
 
-[Releases · sona-tar/ghs](https://github.com/sona-tar/ghs/releases)
-
-or
+[homebrew](http://brew.sh/index_ja.html), [linuxbrew](http://brew.sh/linuxbrew/)
 
 ```zsh
-go get github.com/sona-tar/ghs
+brew install sona-tar/tools/ghs
 ```
+
+for Windows
+[Releases sona-tar/ghs](https://github.com/sona-tar/ghs/releases)
+
 
 Usage
 ===========
@@ -105,4 +107,3 @@ Author
 ===========
 
 [sona-tar (sona_tar)](https://github.com/sona-tar)
-
