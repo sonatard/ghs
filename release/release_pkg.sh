@@ -16,3 +16,5 @@ XC_VERSION=$1
 [ -z "${XC_VERSION}" ] && echo "usage : release_pkg.sh <version>" && exit 1
 
 ghr $2 ${XC_VERSION} pkg/archive/${XC_VERSION}/
+
+openssl sha1 pkg/archive/${XC_VERSION}/*
