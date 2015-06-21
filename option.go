@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/jessevdk/go-flags"
-	"github.com/sona-tar/ghs/debug"
 	"os"
 )
 
@@ -25,8 +24,6 @@ func GhsOptionParser() ([]string, GhsOptions) {
 	parser.Usage = "[OPTION] \"QUERY\""
 	args, err := parser.Parse()
 
-	printGhsOption(args, opts)
-
 	if err != nil {
 		ghsOptionError(parser)
 	}
@@ -47,19 +44,6 @@ func GhsOptionParser() ([]string, GhsOptions) {
 func ghsOptionError(parser *flags.Parser) {
 	printGhsHelp(parser)
 	os.Exit(1)
-}
-
-func printGhsOption(args []string, opts GhsOptions) {
-	debug.Printf("args = %v\n", args)
-
-	debug.Printf("cmd option sort = %s\n", opts.Sort)
-	debug.Printf("cmd option order = %s\n", opts.Order)
-
-	debug.Printf("cmd option language = %s\n", opts.Language)
-	debug.Printf("cmd option User = %s\n", opts.User)
-	debug.Printf("cmd option Repository = %s\n", opts.Repository)
-	debug.Printf("cmd option Version = %s\n", opts.Version)
-	debug.Printf("cmd option Enterprise = %s\n", opts.Enterprise)
 }
 
 func printGhsHelp(parser *flags.Parser) {
