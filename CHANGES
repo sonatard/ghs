@@ -1,5 +1,8 @@
 CHANGES
 =======
+0.0.5 - Oct 21 2015
+  * [feature] Support limits number of search result(-m, --max).
+
 0.0.4 - Jun 04 2015
   * [feature] Support Github Enterprise Option(-e, --enterprise). @kou-m
   * [feature] Support go-latest. check version when ghs -h or -v

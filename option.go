@@ -12,6 +12,7 @@ type GhsOptions struct {
 	Language   string `short:"l"  long:"language"   description:"searches repositories based on the language they’re written in."`
 	User       string `short:"u"  long:"user"       description:"limits searches to a specific user name."`
 	Repository string `short:"r"  long:"repo"       description:"limits searches to a specific repository."`
+	Max        int    `short:"m"  long:"max"        description:"limits number of result. range 1-1000" default:"100"`
 	Version    bool   `short:"v"  long:"version"    description:"print version infomation and exit."`
 	Enterprise string `short:"e"  long:"enterprise" description:"search from github enterprise."`
 }
@@ -35,6 +36,10 @@ func GhsOptionParser() ([]string, GhsOptions) {
 	}
 
 	if (opts.User == "" && opts.Repository == "") && len(args) == 0 {
+		ghsOptionError(parser)
+	}
+
+	if opts.Max < 1 || opts.Max > 1000 {
 		ghsOptionError(parser)
 	}
 

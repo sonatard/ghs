@@ -6,14 +6,8 @@ import (
 	"net/url"
 )
 
-func SearchRepository(sort string, order string, query string, enterprise string) []github.Repository {
+func SearchRepository(sort string, order string, max int, enterprise string, query string) []github.Repository {
 	client := github.NewClient(nil)
-	searchOpts := &github.SearchOptions{
-		Sort:  sort,
-		Order: order,
-		// TextMatch: true,
-		// ListOptions: github.ListOptions{Page: 1, PerPage: 1},
-	}
 
 	if enterprise != "" {
 		baseURL, err := url.Parse(enterprise)
@@ -24,12 +18,39 @@ func SearchRepository(sort string, order string, query string, enterprise string
 		}
 	}
 
-	searchResult, _, err := client.Search.Repositories(query, searchOpts)
-	if err != nil {
-		fmt.Printf("Repository not Found\n")
+	perPage := 100
+
+	if max < 100 {
+		perPage = max
 	}
 
-	return searchResult.Repositories
+	searchOpts := &github.SearchOptions{
+		Sort:        sort,
+		Order:       order,
+		TextMatch:   false,
+		ListOptions: github.ListOptions{PerPage: perPage},
+	}
+
+	var allRepos []github.Repository
+	i := 0
+
+	for {
+		searchResult, resp, err := client.Search.Repositories(query, searchOpts)
+		if err != nil {
+			fmt.Printf("Repository not Found\n")
+		}
+
+		i++
+		allRepos = append(allRepos, searchResult.Repositories...)
+
+		if resp.NextPage == 0 || (i*perPage) >= max {
+			break
+		}
+
+		searchOpts.ListOptions.Page = resp.NextPage
+	}
+
+	return allRepos
 }
 
 func PrintRepository(repos []github.Repository) {
