@@ -5,6 +5,11 @@ ghs
 
 ![](http://f.st-hatena.com/images/fotolife/s/sona-zip/20141029/20141029212146_original.gif?1414585446)
 
+Trial
+===========
+[ghs trial page](https://codepicnic.com/consoles/ghs/embed?sidebar=closed&hide=save,show_result,download,options,run,second_terminal,readme)
+
+
 ghs options
 ===========
 
