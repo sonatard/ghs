@@ -7,6 +7,7 @@ import (
 )
 
 type GhsOptions struct {
+	Fields     string `short:"f"  long:"fields"     description:"limits what fields are searched. 'name', 'description', or 'readme'." default:"name,description"`
 	Sort       string `short:"s"  long:"sort"       description:"The sort field. 'stars', 'forks', or 'updated'." default:"best match"`
 	Order      string `short:"o"  long:"order"      description:"The sort order. 'asc' or 'desc'." default:"desc"`
 	Language   string `short:"l"  long:"language"   description:"searches repositories based on the language they’re written in."`

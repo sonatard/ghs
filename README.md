@@ -19,8 +19,9 @@ Usage:
   ghs [OPTION] "QUERY"
 
 Application Options:
-  -s, --sort=       The sort field. 'stars', 'forks', or 'updated'. (best match)
-  -o, --order=      The sort order. 'asc' or 'desc'. (desc)
+  -f, --fields=     limits what fields are searched. 'name', 'description', or 'readme'. (default: name,description)
+  -s, --sort=       The sort field. 'stars', 'forks', or 'updated'. (default: best match)
+  -o, --order=      The sort order. 'asc' or 'desc'. (default: desc)
   -l, --language=   searches repositories based on the language they’re written in.
   -u, --user=       limits searches to a specific user name.
   -r, --repo=       limits searches to a specific repository.
@@ -62,12 +63,12 @@ ghs "dotfiles"
 
 You can restrict the search to just the repository name.
 ```zsh
-ghs "dotfiles in:name"
+ghs -f name "dotfiles"
 ```
 
 Limits searches to a specific user.
 ```zsh
-ghs "dotfiles in:name" -u sona-tar
+ghs -f name -u sona-tar "dotfiles"
 sona-tar/dotfiles                       dotfiles
 ```
 

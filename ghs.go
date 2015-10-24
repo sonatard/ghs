@@ -1,6 +1,6 @@
 package main
 
-const Version string = "0.0.5"
+const Version string = "0.0.6"
 
 func main() {
 	args, opts := GhsOptionParser()
@@ -10,6 +10,9 @@ func main() {
 		query += arg
 	}
 
+	if opts.Fields != "" {
+		query += " in:" + opts.Fields
+	}
 	if opts.Language != "" {
 		query += " language:" + opts.Language
 	}
