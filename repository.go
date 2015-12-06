@@ -4,64 +4,98 @@ import (
 	"fmt"
 	"github.com/google/go-github/github"
 	"net/url"
+	"sync"
 )
 
-func SearchRepository(sort string, order string, max int, enterprise string, query string) []github.Repository {
+type repo struct {
+	client *github.Client
+	opts   *github.SearchOptions
+	query  string
+	repos  []github.Repository
+}
+
+func NewRepo(sort string, order string, max int, enterprise string, query string) (*repo, error) {
+	var r repo
+
 	client := github.NewClient(nil)
 
 	if enterprise != "" {
 		baseURL, err := url.Parse(enterprise)
-		if err == nil {
-			client.BaseURL = baseURL
-		} else {
-			fmt.Printf("%s cannot parse\n", enterprise)
+		if err != nil {
+			return nil, err
 		}
-	}
-
-	perPage := 100
-
-	if max < 100 {
-		perPage = max
+		client.BaseURL = baseURL
 	}
 
 	searchOpts := &github.SearchOptions{
 		Sort:        sort,
 		Order:       order,
 		TextMatch:   false,
-		ListOptions: github.ListOptions{PerPage: perPage},
+		ListOptions: github.ListOptions{PerPage: 100},
 	}
 
-	var allRepos []github.Repository
-	i := 0
+	r.client = client
+	r.opts = searchOpts
+	r.query = query
 
-	for {
-		searchResult, resp, err := client.Search.Repositories(query, searchOpts)
-		if err != nil {
-			fmt.Printf("Repository not Found\n")
-		}
-
-		i++
-		allRepos = append(allRepos, searchResult.Repositories...)
-
-		if resp.NextPage == 0 || (i*perPage) >= max {
-			break
-		}
-
-		searchOpts.ListOptions.Page = resp.NextPage
-	}
-
-	return allRepos
+	return &r, nil
 }
 
-func PrintRepository(repos []github.Repository) {
+func (r repo) search() (repos []github.Repository) {
+	fmt.Printf("%d go func search start\n", r.opts.ListOptions.Page)
+	ret, _, err := r.client.Search.Repositories(r.query, r.opts)
+	if err != nil {
+		fmt.Printf("Search Error %s\n", r.query)
+	}
+	fmt.Printf("%d go func search end\n", r.opts.ListOptions.Page)
+
+	return ret.Repositories
+}
+
+func (r repo) SearchRepository() (<-chan []github.Repository, <-chan bool) {
+	var wg sync.WaitGroup
+	reposBuff := make(chan []github.Repository, 10)
+	fin := make(chan bool)
+
+	ret, resp, err := r.client.Search.Repositories(r.query, r.opts)
+	if err != nil {
+		fmt.Printf("Search Error %s\n", r.query)
+	}
+	reposBuff <- ret.Repositories
+	last := resp.LastPage
+	fmt.Printf("LastPage = %d\n", last)
+
+	go func() {
+		for i := 0; i < last; i++ {
+			fmt.Printf("main thread %d\n", i)
+			wg.Add(1)
+			r.opts.ListOptions.Page = i
+			go func() {
+				reposBuff <- r.search()
+				wg.Done()
+			}()
+		}
+		fmt.Printf("main thread wait...\n")
+		wg.Wait()
+		fmt.Printf("main thread wakeup!!\n")
+		fin <- false
+	}()
+
+	fmt.Printf("main thread return\n")
+
+	return reposBuff, fin
+}
+
+func (r repo) PrintRepository() {
+	fmt.Printf("%d\n", len(r.repos))
 	repoNameMaxLen := 0
-	for _, repo := range repos {
+	for _, repo := range r.repos {
 		repoNamelen := len(*repo.FullName)
 		if repoNamelen > repoNameMaxLen {
 			repoNameMaxLen = repoNamelen
 		}
 	}
-	for _, repo := range repos {
+	for _, repo := range r.repos {
 		if repo.FullName != nil {
 			fmt.Printf("%v", *repo.FullName)
 		}

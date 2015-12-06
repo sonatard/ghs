@@ -1,9 +1,10 @@
 package main
 
+import "fmt"
+
 const Version string = "0.0.6"
 
-func main() {
-	args, opts := GhsOptionParser()
+func buildQuery(args []string, opts GhsOptions) string {
 	query := ""
 
 	for _, arg := range args {
@@ -23,6 +24,29 @@ func main() {
 		query += " repo:" + opts.Repository
 	}
 
-	repos := SearchRepository(opts.Sort, opts.Order, opts.Max, opts.Enterprise, query)
-	PrintRepository(repos)
+	return query
+}
+
+func main() {
+	args, opts := GhsOptionParser()
+	query := buildQuery(args, opts)
+
+	repo, err := NewRepo(opts.Sort, opts.Order, opts.Max, opts.Enterprise, query)
+	if err != nil {
+		fmt.Printf("Option error\n")
+	}
+
+	reposBuff, fin := repo.SearchRepository()
+
+	for {
+		select {
+		case repo.repos = <-reposBuff:
+			fmt.Printf("print\n")
+			repo.PrintRepository()
+		case <-fin:
+			fmt.Printf("fin\n")
+			return
+		}
+	}
+
 }
