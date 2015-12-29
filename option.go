@@ -16,6 +16,7 @@ type GhsOptions struct {
 	Max        int    `short:"m"  long:"max"        description:"limits number of result. range 1-1000" default:"100"`
 	Version    bool   `short:"v"  long:"version"    description:"print version infomation and exit."`
 	Enterprise string `short:"e"  long:"enterprise" description:"search from github enterprise."`
+	Token      string `short:"t"  long:"token"      description:"Github API token to avoid Github API rate limit"`
 }
 
 func GhsOptionParser() ([]string, GhsOptions) {

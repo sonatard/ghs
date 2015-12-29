@@ -25,8 +25,10 @@ Application Options:
   -l, --language=   searches repositories based on the language they’re written in.
   -u, --user=       limits searches to a specific user name.
   -r, --repo=       limits searches to a specific repository.
+  -m, --max=        limits number of result. range 1-1000 (default: 100)
   -v, --version     print version infomation and exit.
   -e, --enterprise= search from github enterprise.
+  -t, --token=      Github API token to avoid Github API rate limit
 
 Help Options:
   -h, --help        Show this help message
@@ -71,6 +73,29 @@ Limits searches to a specific user.
 ghs -f name -u sona-tar "dotfiles"
 sona-tar/dotfiles                       dotfiles
 ```
+
+Github Authentication to avoid Github API rate limit
+===========
+
+Priority of authentication token
+
+1. Exec `ghs` with `-t` or `--token` option
+
+```bash
+$ ghs -t "....."
+```
+
+2. `GITHUB_TOKEN` environmental variable
+```bash
+$ export GITHUB_TOKEN="....."
+```
+
+3. github.token in gitconfig
+
+```bash
+$ git config --global github.token "....."
+```
+
 
 With [motemen/ghq](https://github.com/motemen/ghq) and [peco/peco](https://github.com/peco/peco)
 ===========

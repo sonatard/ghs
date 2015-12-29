@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"os"
+)
 
 const Version string = "0.0.6"
 
@@ -31,7 +35,7 @@ func main() {
 	args, opts := GhsOptionParser()
 	query := buildQuery(args, opts)
 
-	repo, err := NewRepo(opts.Sort, opts.Order, opts.Max, opts.Enterprise, query)
+	repo, err := NewRepo(opts.Sort, opts.Order, opts.Max, opts.Enterprise, opts.Token, query)
 	if err != nil {
 		fmt.Printf("Option error\n")
 	}
@@ -41,12 +45,20 @@ func main() {
 	for {
 		select {
 		case repo.repos = <-reposBuff:
-			fmt.Printf("print\n")
+			Debug("print\n")
 			repo.PrintRepository()
 		case <-fin:
-			fmt.Printf("fin\n")
+			Debug("fin\n")
 			return
 		}
 	}
 
+}
+
+// Debug display values when DEBUG mode
+// This is used only for developer
+func Debug(v ...interface{}) {
+	if os.Getenv("GHS_DEBUG") != "" {
+		log.Println(v...)
+	}
 }
