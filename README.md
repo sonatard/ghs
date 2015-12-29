@@ -38,7 +38,7 @@ Github search APIv3 QUERY infomation:
    https://help.github.com/articles/searching-repositories/
 
 Version:
-   ghs 0.0.4 (https://github.com/sona-tar/ghs.git)
+   ghs 0.0.6 (https://github.com/sona-tar/ghs.git)
 ```
 
 Install
