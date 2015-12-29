@@ -12,10 +12,12 @@ import (
 )
 
 type repo struct {
-	client *github.Client
-	opts   *github.SearchOptions
-	query  string
-	repos  []github.Repository
+	client     *github.Client
+	opts       *github.SearchOptions
+	query      string
+	repos      []github.Repository
+	printMax   int
+	printCount int
 }
 
 func getToken(optsToken string) string {
@@ -75,7 +77,7 @@ func NewRepo(sort string, order string, max int, enterprise string, token string
 		ListOptions: github.ListOptions{PerPage: 100},
 	}
 
-	return &repo{client: cli, opts: searchOpts, query: query}, nil
+	return &repo{client: cli, opts: searchOpts, query: query, printMax: max}, nil
 }
 
 func (r repo) search() (repos []github.Repository) {
@@ -126,7 +128,7 @@ func (r repo) SearchRepository() (<-chan []github.Repository, <-chan bool) {
 	return reposBuff, fin
 }
 
-func (r repo) PrintRepository() {
+func (r repo) PrintRepository() (end bool) {
 	Debug("%d\n", len(r.repos))
 	repoNameMaxLen := 0
 	for _, repo := range r.repos {
@@ -153,5 +155,11 @@ func (r repo) PrintRepository() {
 		}
 
 		fmt.Printf("\n")
+		r.printCount++
+		if r.printCount >= r.printMax {
+			return true
+		}
+
 	}
+	return false
 }

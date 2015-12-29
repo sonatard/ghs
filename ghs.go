@@ -46,7 +46,11 @@ func main() {
 		select {
 		case repo.repos = <-reposBuff:
 			Debug("print\n")
-			repo.PrintRepository()
+			end := repo.PrintRepository()
+			if end {
+				Debug("over max\n")
+				return
+			}
 		case <-fin:
 			Debug("fin\n")
 			return
