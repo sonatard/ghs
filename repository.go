@@ -13,9 +13,11 @@ import (
 
 type repo struct {
 	client     *github.Client
-	opts       *github.SearchOptions
+	sort       string
+	order      string
 	query      string
 	repos      []github.Repository
+	perPage    int
 	printMax   int
 	printCount int
 }
@@ -69,25 +71,33 @@ func NewRepo(sort string, order string, max int, enterprise string, token string
 		cli.BaseURL = baseURL
 	}
 
-	// Github API Search options
-	searchOpts := &github.SearchOptions{
-		Sort:        sort,
-		Order:       order,
-		TextMatch:   false,
-		ListOptions: github.ListOptions{PerPage: 100},
-	}
-
-	return &repo{client: cli, opts: searchOpts, query: query, printMax: max, printCount: 0}, nil
+	return &repo{
+		client:     cli,
+		sort:       sort,
+		order:      order,
+		query:      query,
+		perPage:    100,
+		printMax:   max,
+		printCount: 0}, nil
 }
 
-func (r *repo) search() (repos []github.Repository) {
-	Debug("%d go func search start\n", r.opts.ListOptions.Page)
-	ret, _, err := r.client.Search.Repositories(r.query, r.opts)
+func (r *repo) search(page int) (repos []github.Repository) {
+	Debug("Page%d go func search start\n", page)
+
+	opts := &github.SearchOptions{
+		Sort:        r.sort,
+		Order:       r.order,
+		TextMatch:   false,
+		ListOptions: github.ListOptions{PerPage: r.perPage, Page: page},
+	}
+
+	Debug("Page%d query : %s\n", page, r.query)
+	ret, _, err := r.client.Search.Repositories(r.query, opts)
 	if err != nil {
 		fmt.Printf("Search Error!! query : %s\n", r.query)
 		fmt.Println(err)
 	}
-	Debug("%d go func search end\n", r.opts.ListOptions.Page)
+	Debug("Page%d go func search end\n", page)
 
 	return ret.Repositories
 }
@@ -96,30 +106,45 @@ func (r *repo) SearchRepository() (<-chan []github.Repository, <-chan bool) {
 	var wg sync.WaitGroup
 	reposBuff := make(chan []github.Repository, 10)
 	fin := make(chan bool)
+	page := 0
 
-	ret, resp, err := r.client.Search.Repositories(r.query, r.opts)
+	opts := &github.SearchOptions{
+		Sort:        r.sort,
+		Order:       r.order,
+		TextMatch:   false,
+		ListOptions: github.ListOptions{PerPage: r.perPage, Page: page},
+	}
+
+	ret, resp, err := r.client.Search.Repositories(r.query, opts)
 	if err != nil {
 		fmt.Printf("Search Error!! query : %s\n", r.query)
 		fmt.Println(err)
 		os.Exit(1)
 	}
+	Debug("Total = %d\n", ret.Total)
 	reposBuff <- ret.Repositories
-	last := resp.LastPage
+	Debug("main thread repos length %d\n", len(ret.Repositories))
+	last := ((r.printMax - 1) / r.perPage)
+	if resp.LastPage < last {
+		last = resp.LastPage
+	}
+
+	Debug("resp.LastPage = %d\n", resp.LastPage)
 	Debug("LastPage = %d\n", last)
+	page++
 
 	go func() {
-		for i := 1; i < last; i++ {
-			Debug("main thread %d\n", i)
+		for ; page < last+1; page++ {
+			Debug("sub thread %d\n", page)
 			wg.Add(1)
-			r.opts.ListOptions.Page = i
-			go func() {
-				reposBuff <- r.search()
+			go func(p int) {
+				reposBuff <- r.search(p)
 				wg.Done()
-			}()
+			}(page)
 		}
-		Debug("main thread wait...\n")
+		Debug("sub thread wait...\n")
 		wg.Wait()
-		Debug("main thread wakeup!!\n")
+		Debug("sub thread wakeup!!\n")
 		fin <- true
 	}()
 

@@ -42,17 +42,23 @@ func main() {
 
 	reposBuff, fin := repo.SearchRepository()
 
+	Debug("main thread select start...\n")
 	for {
 		select {
-		case repo.repos = <-reposBuff:
-			Debug("print\n")
+		case repos := <-reposBuff:
+			Debug("main thread chan reposBuff\n")
+			Debug("main thread repos length %d\n", len(repos))
+
+			repo.repos = append(repo.repos, repos...)
+			Debug("main thread repo.repos length %d\n", len(repo.repos))
+		case <-fin:
+			Debug("main thread chan fin\n")
 			end := repo.PrintRepository()
 			if end {
 				Debug("over max\n")
 				return
 			}
-		case <-fin:
-			Debug("fin\n")
+
 			return
 		}
 	}
