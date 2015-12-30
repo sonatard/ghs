@@ -77,10 +77,10 @@ func NewRepo(sort string, order string, max int, enterprise string, token string
 		ListOptions: github.ListOptions{PerPage: 100},
 	}
 
-	return &repo{client: cli, opts: searchOpts, query: query, printMax: max}, nil
+	return &repo{client: cli, opts: searchOpts, query: query, printMax: max, printCount: 0}, nil
 }
 
-func (r repo) search() (repos []github.Repository) {
+func (r *repo) search() (repos []github.Repository) {
 	Debug("%d go func search start\n", r.opts.ListOptions.Page)
 	ret, _, err := r.client.Search.Repositories(r.query, r.opts)
 	if err != nil {
@@ -92,7 +92,7 @@ func (r repo) search() (repos []github.Repository) {
 	return ret.Repositories
 }
 
-func (r repo) SearchRepository() (<-chan []github.Repository, <-chan bool) {
+func (r *repo) SearchRepository() (<-chan []github.Repository, <-chan bool) {
 	var wg sync.WaitGroup
 	reposBuff := make(chan []github.Repository, 10)
 	fin := make(chan bool)
@@ -108,7 +108,7 @@ func (r repo) SearchRepository() (<-chan []github.Repository, <-chan bool) {
 	Debug("LastPage = %d\n", last)
 
 	go func() {
-		for i := 0; i < last; i++ {
+		for i := 1; i < last; i++ {
 			Debug("main thread %d\n", i)
 			wg.Add(1)
 			r.opts.ListOptions.Page = i
@@ -128,8 +128,8 @@ func (r repo) SearchRepository() (<-chan []github.Repository, <-chan bool) {
 	return reposBuff, fin
 }
 
-func (r repo) PrintRepository() (end bool) {
-	Debug("%d\n", len(r.repos))
+func (r *repo) PrintRepository() (end bool) {
+	Debug("r.repos length %d\n", len(r.repos))
 	repoNameMaxLen := 0
 	for _, repo := range r.repos {
 		repoNamelen := len(*repo.FullName)
