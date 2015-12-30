@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-const Version string = "0.0.6"
+const Version string = "0.0.7"
 
 func buildQuery(args []string, opts GhsOptions) string {
 	query := ""
