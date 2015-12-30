@@ -12,7 +12,7 @@ func buildQuery(args []string, opts GhsOptions) string {
 	query := ""
 
 	for _, arg := range args {
-		query += arg
+		query += " " + arg
 	}
 
 	if opts.Fields != "" {

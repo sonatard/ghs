@@ -109,7 +109,7 @@ func (r *repo) SearchRepository() (<-chan []github.Repository, <-chan bool) {
 		TextMatch:   false,
 		ListOptions: github.ListOptions{PerPage: r.perPage, Page: page},
 	}
-
+	Debug("Page%d query : %s\n", page, r.query)
 	ret, resp, err := r.client.Search.Repositories(r.query, opts)
 	if err != nil {
 		fmt.Printf("Search Error!! query : %s\n", r.query)
