@@ -23,25 +23,25 @@ type repo struct {
 func getToken(optsToken string) string {
 	// -t or --token option
 	if optsToken != "" {
-		Debug("Github token get from option value")
+		Debug("Github token get from option value\n")
 		return optsToken
 	}
 
 	// GITHUB_TOKEN environment
 	token := os.Getenv("GITHUB_TOKEN")
 	if token != "" {
-		Debug("Github token get from environment value")
+		Debug("Github token get from environment value\n")
 		return token
 	}
 
 	// github.token in gitconfig
 	token, err := gitconfig.GetString("github.token")
 	if err == nil {
-		Debug("Github token get from gitconfig value")
+		Debug("Github token get from gitconfig value\n")
 		return token
 	}
 
-	Debug("Github token not found")
+	Debug("Github token not found\n")
 	return ""
 }
 
@@ -139,27 +139,35 @@ func (r repo) PrintRepository() (end bool) {
 	}
 	for _, repo := range r.repos {
 		if repo.FullName != nil {
-			fmt.Printf("%v", *repo.FullName)
+			printf("%v", *repo.FullName)
 		}
 
-		fmt.Printf("    ")
+		printf("    ")
 
 		paddingLen := repoNameMaxLen - len(*repo.FullName)
 
 		for i := 0; i < paddingLen; i++ {
-			fmt.Printf(" ")
+			printf(" ")
 		}
 
 		if repo.Description != nil {
-			fmt.Printf("%v", *repo.Description)
+			printf("%v", *repo.Description)
 		}
 
-		fmt.Printf("\n")
+		printf("\n")
+
 		r.printCount++
+		Debug("printCount %d\n", r.printCount)
 		if r.printCount >= r.printMax {
 			return true
 		}
 
 	}
 	return false
+}
+
+func printf(format string, args ...interface{}) {
+	if os.Getenv("GHS_PRINT") != "no" {
+		fmt.Printf(format, args...)
+	}
 }

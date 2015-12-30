@@ -61,8 +61,8 @@ func main() {
 
 // Debug display values when DEBUG mode
 // This is used only for developer
-func Debug(v ...interface{}) {
+func Debug(format string, args ...interface{}) {
 	if os.Getenv("GHS_DEBUG") != "" {
-		log.Println(v...)
+		log.Printf(format, args...)
 	}
 }
