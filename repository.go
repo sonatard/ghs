@@ -30,15 +30,13 @@ func getToken(optsToken string) string {
 	}
 
 	// GITHUB_TOKEN environment
-	token := os.Getenv("GITHUB_TOKEN")
-	if token != "" {
+	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
 		Debug("Github token get from environment value\n")
 		return token
 	}
 
 	// github.token in gitconfig
-	token, err := gitconfig.GetString("github.token")
-	if err == nil {
+	if token, err := gitconfig.GetString("github.token"); err == nil {
 		Debug("Github token get from gitconfig value\n")
 		return token
 	}
@@ -48,12 +46,9 @@ func getToken(optsToken string) string {
 }
 
 func NewRepo(sort string, order string, max int, enterprise string, token string, query string) (*repo, error) {
-
-	// Github Token authentication
-	githubToken := getToken(token)
-
 	var tc *http.Client
-	if githubToken != "" {
+
+	if githubToken := getToken(token); githubToken != "" {
 		ts := oauth2.StaticTokenSource(
 			&oauth2.Token{AccessToken: githubToken},
 		)
