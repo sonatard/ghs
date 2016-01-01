@@ -11,14 +11,18 @@ import (
 	"sync"
 )
 
+type SearchInfo struct {
+	sort    string
+	order   string
+	query   string
+	max     int
+	perPage int
+}
+
 type repo struct {
 	client     *github.Client
-	sort       string
-	order      string
-	query      string
+	info       *SearchInfo
 	repos      []github.Repository
-	perPage    int
-	printMax   int
 	printCount int
 }
 
@@ -45,7 +49,7 @@ func getToken(optsToken string) string {
 	return ""
 }
 
-func NewRepo(sort string, order string, max int, enterprise string, token string, query string) (*repo, error) {
+func NewRepo(info *SearchInfo, baseURL *url.URL, token string) (*repo, error) {
 	var tc *http.Client
 
 	if githubToken := getToken(token); githubToken != "" {
@@ -57,22 +61,13 @@ func NewRepo(sort string, order string, max int, enterprise string, token string
 
 	cli := github.NewClient(tc)
 
-	// Github API
-	if enterprise != "" {
-		baseURL, err := url.Parse(enterprise)
-		if err != nil {
-			return nil, err
-		}
+	if baseURL != nil {
 		cli.BaseURL = baseURL
 	}
 
 	return &repo{
 		client:     cli,
-		sort:       sort,
-		order:      order,
-		query:      query,
-		perPage:    100,
-		printMax:   max,
+		info:       info,
 		printCount: 0}, nil
 }
 
@@ -80,16 +75,16 @@ func (r *repo) search(page int) (repos []github.Repository) {
 	Debug("Page%d go func search start\n", page)
 
 	opts := &github.SearchOptions{
-		Sort:        r.sort,
-		Order:       r.order,
+		Sort:        r.info.sort,
+		Order:       r.info.order,
 		TextMatch:   false,
-		ListOptions: github.ListOptions{PerPage: r.perPage, Page: page},
+		ListOptions: github.ListOptions{PerPage: r.info.perPage, Page: page},
 	}
 
-	Debug("Page%d query : %s\n", page, r.query)
-	ret, _, err := r.client.Search.Repositories(r.query, opts)
+	Debug("Page%d query : %s\n", page, r.info.query)
+	ret, _, err := r.client.Search.Repositories(r.info.query, opts)
 	if err != nil {
-		fmt.Printf("Search Error!! query : %s\n", r.query)
+		fmt.Printf("Search Error!! query : %s\n", r.info.query)
 		fmt.Println(err)
 	}
 	Debug("Page%d go func search end\n", page)
@@ -104,22 +99,22 @@ func (r *repo) SearchRepository() (<-chan []github.Repository, <-chan bool) {
 	page := 0
 
 	opts := &github.SearchOptions{
-		Sort:        r.sort,
-		Order:       r.order,
+		Sort:        r.info.sort,
+		Order:       r.info.order,
 		TextMatch:   false,
-		ListOptions: github.ListOptions{PerPage: r.perPage, Page: page},
+		ListOptions: github.ListOptions{PerPage: r.info.perPage, Page: page},
 	}
-	Debug("Page%d query : %s\n", page, r.query)
-	ret, resp, err := r.client.Search.Repositories(r.query, opts)
+	Debug("Page%d query : %s\n", page, r.info.query)
+	ret, resp, err := r.client.Search.Repositories(r.info.query, opts)
 	if err != nil {
-		fmt.Printf("Search Error!! query : %s\n", r.query)
+		fmt.Printf("Search Error!! query : %s\n", r.info.query)
 		fmt.Println(err)
 		os.Exit(1)
 	}
 	Debug("Total = %d\n", ret.Total)
 	reposBuff <- ret.Repositories
 	Debug("main thread repos length %d\n", len(ret.Repositories))
-	last := ((r.printMax - 1) / r.perPage)
+	last := ((r.info.max - 1) / r.info.perPage)
 	if resp.LastPage < last {
 		last = resp.LastPage
 	}
@@ -178,7 +173,7 @@ func (r *repo) PrintRepository() (end bool) {
 
 		r.printCount++
 		Debug("printCount %d\n", r.printCount)
-		if r.printCount >= r.printMax {
+		if r.printCount >= r.info.max {
 			return true
 		}
 

@@ -8,34 +8,24 @@ import (
 
 const Version string = "0.0.7"
 
-func buildQuery(args []string, opts GhsOptions) string {
-	query := ""
-
-	for _, arg := range args {
-		query += " " + arg
-	}
-
-	if opts.Fields != "" {
-		query += " in:" + opts.Fields
-	}
-	if opts.Language != "" {
-		query += " language:" + opts.Language
-	}
-	if opts.User != "" {
-		query += " user:" + opts.User
-	}
-	if opts.Repository != "" {
-		query += " repo:" + opts.Repository
-	}
-
-	return query
-}
+const (
+	ExitCodeOK = iota
+	ExitCodeError
+)
 
 func main() {
-	args, opts := GhsOptionParser()
-	query := buildQuery(args, opts)
+	flags, err := NewFlags()
+	if err != nil {
+		flags.printHelp()
+		os.Exit(ExitCodeError)
+	}
 
-	repo, err := NewRepo(opts.Sort, opts.Order, opts.Max, opts.Enterprise, opts.Token, query)
+	exit, exitCode, searchInfo, url, token := flags.ParseOption()
+	if exit {
+		os.Exit(exitCode)
+	}
+
+	repo, err := NewRepo(searchInfo, url, token)
 	if err != nil {
 		fmt.Printf("Option error\n")
 	}
@@ -62,7 +52,6 @@ func main() {
 			return
 		}
 	}
-
 }
 
 // Debug display values when DEBUG mode
