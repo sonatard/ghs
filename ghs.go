@@ -2,15 +2,19 @@ package main
 
 import (
 	"fmt"
-	"github.com/google/go-github/github"
 	"log"
 	"os"
+
+	"github.com/google/go-github/github"
 )
 
+// Version is ghs version number
 const Version string = "0.0.7"
 
 const (
+	// ExitCodeOK is 0
 	ExitCodeOK = iota
+	// ExitCodeError is 1
 	ExitCodeError
 )
 
@@ -21,31 +25,31 @@ func main() {
 		os.Exit(ExitCodeError)
 	}
 
-	exit, exitCode, searchInfo, url, token := flags.ParseOption()
+	exit, exitCode, sOpt, url, token := flags.ParseOption()
 	if exit {
 		os.Exit(exitCode)
 	}
 
-	repo, err := NewRepo(searchInfo, url, token)
+	repo, err := NewRepo(NewSearch(sOpt, url, token))
 	if err != nil {
 		fmt.Printf("Option error\n")
 	}
 
-	reposBuff, one_request_fin := repo.SearchRepository()
+	reposChan, oneRequestFin := repo.Search()
 
 	Debug("main thread select start...\n")
 	var repos []github.Repository
 	for {
 		select {
-		case one_req_repos := <-reposBuff:
-			Debug("main thread chan reposBuff\n")
-			Debug("main thread one_req_repos length %d\n", len(one_req_repos))
+		case oneReqRepos := <-reposChan:
+			Debug("main thread chan reposChan\n")
+			Debug("main thread oneReqRepos length %d\n", len(oneReqRepos))
 
-			repos = append(repos, one_req_repos...)
+			repos = append(repos, oneReqRepos...)
 			Debug("main thread repos length %d\n", len(repos))
-		case <-one_request_fin:
+		case <-oneRequestFin:
 			Debug("main thread chan fin\n")
-			end := repo.PrintRepository(repos)
+			end := repo.Print(repos)
 			if end {
 				Debug("over max\n")
 				return

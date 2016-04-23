@@ -2,17 +2,21 @@ package main
 
 import (
 	"fmt"
-	"github.com/jessevdk/go-flags"
 	"net/url"
 	"os"
+
+	"github.com/jessevdk/go-flags"
+	"github.com/motemen/go-gitconfig"
 )
 
+// Flags is args, opts and parser
 type Flags struct {
 	args    []string
 	cmdOpts CmdOptions
 	parser  *flags.Parser
 }
 
+// CmdOptions is ghs command line option list
 type CmdOptions struct {
 	Fields     string `short:"f"  long:"fields"     description:"limits what fields are searched. 'name', 'description', or 'readme'." default:"name,description"`
 	Sort       string `short:"s"  long:"sort"       description:"The sort field. 'stars', 'forks', or 'updated'." default:"best match"`
@@ -37,14 +41,20 @@ func NewFlags() (*Flags, error) {
 	return &Flags{args, opts, parser}, err
 }
 
-func (f *Flags) ParseOption() (bool, int, *SearchInfo, *url.URL, string) {
+func (f *Flags) ParseOption() (bool, int, *SearchOpt, *url.URL, string) {
 	if f.cmdOpts.Version {
 		fmt.Printf("ghs %s\n", Version)
 		checkVersion(Version)
 		return true, ExitCodeOK, nil, nil, ""
 	}
 
-	if (f.cmdOpts.User == "" && f.cmdOpts.Repository == "" && f.cmdOpts.Language == "") && len(f.args) == 0 {
+	errorQuery := func(opts CmdOptions, args []string) bool {
+		noargs := len(args) == 0
+		noopt := opts.User == "" && opts.Repository == "" && opts.Language == ""
+		return noargs && noopt
+	}
+
+	if errorQuery(f.cmdOpts, f.args) {
 		f.printHelp()
 		checkVersion(Version)
 		return true, ExitCodeError, nil, nil, ""
@@ -66,39 +76,60 @@ func (f *Flags) ParseOption() (bool, int, *SearchInfo, *url.URL, string) {
 		}
 		baseURL = url
 	}
+	getToken := func(optsToken string) string {
+		// -t or --token option
+		if optsToken != "" {
+			Debug("Github token get from option value\n")
+			return optsToken
+		}
 
-	query := f.buildQuery()
+		// GITHUB_TOKEN environment
+		if token := os.Getenv("GITHUB_TOKEN"); token != "" {
+			Debug("Github token get from environment value\n")
+			return token
+		}
+
+		// github.token in gitconfig
+		if token, err := gitconfig.GetString("github.token"); err == nil {
+			Debug("Github token get from gitconfig value\n")
+			return token
+		}
+
+		Debug("Github token not found\n")
+		return ""
+	}
+
+	buildQuery := func(opts CmdOptions, args []string) string {
+		query := ""
+
+		for _, arg := range args {
+			query += " " + arg
+		}
+
+		if opts.Fields != "" {
+			query += " in:" + opts.Fields
+		}
+		if opts.Language != "" {
+			query += " language:" + opts.Language
+		}
+		if opts.User != "" {
+			query += " user:" + opts.User
+		}
+		if opts.Repository != "" {
+			query += " repo:" + opts.Repository
+		}
+
+		return query
+	}
 
 	return false, ExitCodeOK,
-		&SearchInfo{sort: f.cmdOpts.Sort,
+		&SearchOpt{
+			sort:    f.cmdOpts.Sort,
 			order:   f.cmdOpts.Order,
-			query:   query,
+			query:   buildQuery(f.cmdOpts, f.args),
 			perPage: 100,
 			max:     f.cmdOpts.Max},
-		baseURL, f.cmdOpts.Token
-}
-
-func (f *Flags) buildQuery() string {
-	query := ""
-
-	for _, arg := range f.args {
-		query += " " + arg
-	}
-
-	if f.cmdOpts.Fields != "" {
-		query += " in:" + f.cmdOpts.Fields
-	}
-	if f.cmdOpts.Language != "" {
-		query += " language:" + f.cmdOpts.Language
-	}
-	if f.cmdOpts.User != "" {
-		query += " user:" + f.cmdOpts.User
-	}
-	if f.cmdOpts.Repository != "" {
-		query += " repo:" + f.cmdOpts.Repository
-	}
-
-	return query
+		baseURL, getToken(f.cmdOpts.Token)
 }
 
 func (f *Flags) printHelp() {

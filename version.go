@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/mgutz/ansi"
 	"github.com/tcnksm/go-latest"
 )
