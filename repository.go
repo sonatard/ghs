@@ -72,15 +72,19 @@ func NewRepo(info *SearchInfo, baseURL *url.URL, token string) (*repo, error) {
 		print_count: 0}, nil
 }
 
-func (r *repo) firset_search() (repos []github.Repository, last_page int, max_count int) {
+func s(client *github.Client, page int, si *SearchInfo) (*github.RepositoriesSearchResult, *github.Response, error) {
 	opts := &github.SearchOptions{
-		Sort:        r.info.sort,
-		Order:       r.info.order,
+		Sort:        si.sort,
+		Order:       si.order,
 		TextMatch:   false,
-		ListOptions: github.ListOptions{PerPage: r.info.perPage, Page: 1},
+		ListOptions: github.ListOptions{PerPage: si.perPage, Page: page},
 	}
-	Debug("Page%d query : %s\n", 1, r.info.query)
-	ret, resp, err := r.client.Search.Repositories(r.info.query, opts)
+	return client.Search.Repositories(si.query, opts)
+}
+
+func (r *repo) first_search() (repos []github.Repository, last_page int, max_count int) {
+	ret, resp, err := s(r.client, 1, r.info)
+
 	if err != nil {
 		fmt.Printf("Search Error!! query : %s\n", r.info.query)
 		fmt.Println(err)
@@ -108,15 +112,8 @@ func (r *repo) firset_search() (repos []github.Repository, last_page int, max_co
 func (r *repo) search(page int) (repos []github.Repository) {
 	Debug("Page%d go func search start\n", page)
 
-	opts := &github.SearchOptions{
-		Sort:        r.info.sort,
-		Order:       r.info.order,
-		TextMatch:   false,
-		ListOptions: github.ListOptions{PerPage: r.info.perPage, Page: page},
-	}
-
 	Debug("Page%d query : %s\n", page, r.info.query)
-	ret, _, err := r.client.Search.Repositories(r.info.query, opts)
+	ret, _, err := s(r.client, page, r.info)
 	if err != nil {
 		fmt.Printf("Search Error!! query : %s\n", r.info.query)
 		fmt.Println(err)
@@ -133,7 +130,7 @@ func (r *repo) SearchRepository() (<-chan []github.Repository, <-chan bool) {
 	fin := make(chan bool)
 
 	// 1st search
-	repos, last, max := r.firset_search()
+	repos, last, max := r.first_search()
 
 	// notify main thread of first search result
 	r.last_page = last
