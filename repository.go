@@ -20,9 +20,11 @@ type SearchInfo struct {
 }
 
 type repo struct {
-	client     *github.Client
-	info       *SearchInfo
-	printCount int
+	client      *github.Client
+	info        *SearchInfo
+	last_page   int
+	max_count   int
+	print_count int
 }
 
 func getToken(optsToken string) string {
@@ -65,9 +67,42 @@ func NewRepo(info *SearchInfo, baseURL *url.URL, token string) (*repo, error) {
 	}
 
 	return &repo{
-		client:     cli,
-		info:       info,
-		printCount: 0}, nil
+		client:      cli,
+		info:        info,
+		print_count: 0}, nil
+}
+
+func (r *repo) firset_search() (repos []github.Repository, last_page int, max_count int) {
+	opts := &github.SearchOptions{
+		Sort:        r.info.sort,
+		Order:       r.info.order,
+		TextMatch:   false,
+		ListOptions: github.ListOptions{PerPage: r.info.perPage, Page: 1},
+	}
+	Debug("Page%d query : %s\n", 1, r.info.query)
+	ret, resp, err := r.client.Search.Repositories(r.info.query, opts)
+	if err != nil {
+		fmt.Printf("Search Error!! query : %s\n", r.info.query)
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	Debug("main thread repos length %d\n", len(ret.Repositories))
+
+	max := r.info.max
+	Debug("Total = %d\n", *ret.Total)
+	Debug("r.info.max = %d\n", r.info.max)
+	if *ret.Total < max {
+		max = *ret.Total
+	}
+
+	last := ((max - 1) / r.info.perPage) + 1
+	Debug("resp.LastPage = %d\n", resp.LastPage)
+	Debug("last = %d\n", last)
+	if resp.LastPage < last {
+		last = resp.LastPage
+	}
+
+	return ret.Repositories, last, max
 }
 
 func (r *repo) search(page int) (repos []github.Repository) {
@@ -94,43 +129,26 @@ func (r *repo) search(page int) (repos []github.Repository) {
 
 func (r *repo) SearchRepository() (<-chan []github.Repository, <-chan bool) {
 	var wg sync.WaitGroup
-	reposBuff := make(chan []github.Repository, 10)
+	reposBuff := make(chan []github.Repository, 1000)
 	fin := make(chan bool)
-	page := 1
 
-	opts := &github.SearchOptions{
-		Sort:        r.info.sort,
-		Order:       r.info.order,
-		TextMatch:   false,
-		ListOptions: github.ListOptions{PerPage: r.info.perPage, Page: page},
-	}
-	Debug("Page%d query : %s\n", page, r.info.query)
-	ret, resp, err := r.client.Search.Repositories(r.info.query, opts)
-	if err != nil {
-		fmt.Printf("Search Error!! query : %s\n", r.info.query)
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	Debug("Total = %d\n", *ret.Total)
-	if *ret.Total < r.info.max {
-		r.info.max = *ret.Total
-	}
+	// 1st search
+	repos, last, max := r.firset_search()
 
-	reposBuff <- ret.Repositories
-	Debug("main thread repos length %d\n", len(ret.Repositories))
-	last := ((r.info.max - 1) / r.info.perPage) + 1
-	if resp.LastPage < last {
-		last = resp.LastPage
-	}
+	// notify main thread of first search result
+	r.last_page = last
+	r.max_count = max
+	reposBuff <- repos
+	Debug("Search settings r.last_page = %d\n", r.last_page)
+	Debug("Search settings r.max_count = %d\n", r.max_count)
 
-	Debug("resp.LastPage = %d\n", resp.LastPage)
-	Debug("LastPage = %d\n", last)
-
+	// 2nd - 10th search
 	go func() {
-		for page = 2; page < last+1; page++ {
+		for page := 2; page < last+1; page++ {
 			Debug("sub thread %d\n", page)
 			wg.Add(1)
 			go func(p int) {
+				// notify main thread of 2nd - 10th search result
 				reposBuff <- r.search(p)
 				wg.Done()
 			}(page)
@@ -174,12 +192,11 @@ func (r *repo) PrintRepository(repos []github.Repository) (end bool) {
 
 		printf("\n")
 
-		r.printCount++
-		Debug("printCount %d, max %d\n", r.printCount, r.info.max)
-		if r.printCount >= r.info.max {
+		r.print_count++
+		Debug("print_count %d, max_count %d\n", r.print_count, r.max_count)
+		if r.print_count >= r.max_count {
 			return true
 		}
-
 	}
 	return false
 }
