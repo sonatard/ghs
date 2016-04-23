@@ -96,7 +96,7 @@ func (r *repo) SearchRepository() (<-chan []github.Repository, <-chan bool) {
 	var wg sync.WaitGroup
 	reposBuff := make(chan []github.Repository, 10)
 	fin := make(chan bool)
-	page := 0
+	page := 1
 
 	opts := &github.SearchOptions{
 		Sort:        r.info.sort,
@@ -111,20 +111,23 @@ func (r *repo) SearchRepository() (<-chan []github.Repository, <-chan bool) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	Debug("Total = %d\n", ret.Total)
+	Debug("Total = %d\n", *ret.Total)
+	if *ret.Total < r.info.max {
+		r.info.max = *ret.Total
+	}
+
 	reposBuff <- ret.Repositories
 	Debug("main thread repos length %d\n", len(ret.Repositories))
-	last := ((r.info.max - 1) / r.info.perPage)
+	last := ((r.info.max - 1) / r.info.perPage) + 1
 	if resp.LastPage < last {
 		last = resp.LastPage
 	}
 
 	Debug("resp.LastPage = %d\n", resp.LastPage)
 	Debug("LastPage = %d\n", last)
-	page++
 
 	go func() {
-		for ; page < last+1; page++ {
+		for page = 2; page < last+1; page++ {
 			Debug("sub thread %d\n", page)
 			wg.Add(1)
 			go func(p int) {
