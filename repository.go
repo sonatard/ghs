@@ -22,7 +22,6 @@ type SearchInfo struct {
 type repo struct {
 	client     *github.Client
 	info       *SearchInfo
-	repos      []github.Repository
 	printCount int
 }
 
@@ -87,6 +86,7 @@ func (r *repo) search(page int) (repos []github.Repository) {
 		fmt.Printf("Search Error!! query : %s\n", r.info.query)
 		fmt.Println(err)
 	}
+	Debug("Page%d go func search result length %d\n", page, len(ret.Repositories))
 	Debug("Page%d go func search end\n", page)
 
 	return ret.Repositories
@@ -143,16 +143,16 @@ func (r *repo) SearchRepository() (<-chan []github.Repository, <-chan bool) {
 	return reposBuff, fin
 }
 
-func (r *repo) PrintRepository() (end bool) {
-	Debug("r.repos length %d\n", len(r.repos))
+func (r *repo) PrintRepository(repos []github.Repository) (end bool) {
+	Debug("repos length %d\n", len(repos))
 	repoNameMaxLen := 0
-	for _, repo := range r.repos {
+	for _, repo := range repos {
 		repoNamelen := len(*repo.FullName)
 		if repoNamelen > repoNameMaxLen {
 			repoNameMaxLen = repoNamelen
 		}
 	}
-	for _, repo := range r.repos {
+	for _, repo := range repos {
 		if repo.FullName != nil {
 			printf("%v", *repo.FullName)
 		}
@@ -172,7 +172,7 @@ func (r *repo) PrintRepository() (end bool) {
 		printf("\n")
 
 		r.printCount++
-		Debug("printCount %d\n", r.printCount)
+		Debug("printCount %d, max %d\n", r.printCount, r.info.max)
 		if r.printCount >= r.info.max {
 			return true
 		}

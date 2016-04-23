@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/google/go-github/github"
 	"log"
 	"os"
 )
@@ -30,26 +31,25 @@ func main() {
 		fmt.Printf("Option error\n")
 	}
 
-	reposBuff, fin := repo.SearchRepository()
+	reposBuff, one_request_fin := repo.SearchRepository()
 
 	Debug("main thread select start...\n")
+	var repos []github.Repository
 	for {
 		select {
-		case repos := <-reposBuff:
+		case one_req_repos := <-reposBuff:
 			Debug("main thread chan reposBuff\n")
-			Debug("main thread repos length %d\n", len(repos))
+			Debug("main thread one_req_repos length %d\n", len(one_req_repos))
 
-			repo.repos = append(repo.repos, repos...)
-			Debug("main thread repo.repos length %d\n", len(repo.repos))
-		case <-fin:
+			repos = append(repos, one_req_repos...)
+			Debug("main thread repos length %d\n", len(repos))
+		case <-one_request_fin:
 			Debug("main thread chan fin\n")
-			end := repo.PrintRepository()
+			end := repo.PrintRepository(repos)
 			if end {
 				Debug("over max\n")
 				return
 			}
-
-			return
 		}
 	}
 }
