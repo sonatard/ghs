@@ -40,14 +40,14 @@ func NewSearch(opt *SearchOpt, baseURL *url.URL, token string) *Search {
 	return &Search{client: cli, option: opt}
 }
 
-func repoSearch(client *github.Client, page int, si *SearchOpt) (*github.RepositoriesSearchResult, *github.Response, error) {
+func repoSearch(client *github.Client, page int, opt *SearchOpt) (*github.RepositoriesSearchResult, *github.Response, error) {
 	opts := &github.SearchOptions{
-		Sort:        si.sort,
-		Order:       si.order,
+		Sort:        opt.sort,
+		Order:       opt.order,
 		TextMatch:   false,
-		ListOptions: github.ListOptions{PerPage: si.perPage, Page: page},
+		ListOptions: github.ListOptions{PerPage: opt.perPage, Page: page},
 	}
-	return client.Search.Repositories(si.query, opts)
+	return client.Search.Repositories(opt.query, opts)
 }
 
 func (s *Search) First() (repos []github.Repository, lastPage int, maxItem int) {

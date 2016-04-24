@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -30,11 +29,7 @@ func main() {
 		os.Exit(exitCode)
 	}
 
-	repo, err := NewRepo(NewSearch(sOpt, url, token))
-	if err != nil {
-		fmt.Printf("Option error\n")
-	}
-
+	repo := NewRepo(NewSearch(sOpt, url, token))
 	reposChan, oneRequestFin := repo.Search()
 
 	Debug("main thread select start...\n")

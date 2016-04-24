@@ -14,8 +14,8 @@ type Repo struct {
 	printCount int
 }
 
-func NewRepo(s *Search) (*Repo, error) {
-	return &Repo{s, 0, 0}, nil
+func NewRepo(s *Search) *Repo {
+	return &Repo{s, 0, 0}
 }
 
 func (r *Repo) Search() (<-chan []github.Repository, <-chan bool) {

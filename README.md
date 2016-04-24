@@ -1,6 +1,8 @@
 ghs
 ======
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/sona-tar/ghs)](https://goreportcard.com/report/github.com/sona-tar/ghs)
+
 `ghs` - command-line utility for searching Github repositoy.
 
 ![](http://f.st-hatena.com/images/fotolife/s/sona-zip/20141029/20141029212146_original.gif?1414585446)
