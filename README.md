@@ -1,6 +1,7 @@
 ghs
 ======
 
+[![Build Status](https://travis-ci.org/sona-tar/ghs.svg?branch=master)](https://travis-ci.org/sona-tar/ghs)
 [![Go Report Card](https://goreportcard.com/badge/github.com/sona-tar/ghs)](https://goreportcard.com/report/github.com/sona-tar/ghs)
 
 `ghs` - command-line utility for searching Github repositoy.
