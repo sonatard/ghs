@@ -30,14 +30,12 @@ type CmdOptions struct {
 	Token      string `short:"t"  long:"token"      description:"Github API token to avoid Github API rate "`
 }
 
-func NewFlags() (*Flags, error) {
+func NewFlags(args []string) (*Flags, error) {
 	var opts CmdOptions
 	parser := flags.NewParser(&opts, flags.HelpFlag)
-
 	parser.Name = "ghs"
 	parser.Usage = "[OPTION] \"QUERY\""
-	args, err := parser.Parse()
-
+	args, err := parser.ParseArgs(args)
 	return &Flags{args, opts, parser}, err
 }
 

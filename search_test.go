@@ -8,6 +8,65 @@ import (
 	"testing"
 )
 
+type pageTestReulst struct {
+	printLastPage int
+	printMax      int
+}
+
+func TestSearch_Page(t *testing.T) {
+	assert := func(result interface{}, want interface{}) {
+		if !reflect.DeepEqual(result, want) {
+			t.Errorf("Returned %+v, want %+v", result, want)
+		}
+	}
+	// pageTest: max,      total, perPage
+	// Result:   lastPage, max
+	// normal test
+	assert(pageTest(1000, 1000, 100), &pageTestReulst{10, 1000})
+	// total test
+	assert(pageTest(1000, 100, 100), &pageTestReulst{1, 100})
+	assert(pageTest(1000, 101, 100), &pageTestReulst{2, 101})
+	assert(pageTest(1000, 500, 100), &pageTestReulst{5, 500})
+	assert(pageTest(1000, 1, 100), &pageTestReulst{1, 1})
+	assert(pageTest(2000, 1000, 100), &pageTestReulst{10, 1000})
+	// max test
+	assert(pageTest(100, 1000, 100), &pageTestReulst{1, 100})
+	assert(pageTest(101, 1000, 100), &pageTestReulst{2, 101})
+	assert(pageTest(500, 1000, 100), &pageTestReulst{5, 500})
+	assert(pageTest(1, 1000, 100), &pageTestReulst{1, 1})
+	assert(pageTest(2000, 1000, 100), &pageTestReulst{10, 1000})
+	// perPage test
+	assert(pageTest(1000, 1000, 1), &pageTestReulst{1000, 1000})
+	assert(pageTest(1000, 1000, 2), &pageTestReulst{500, 1000})
+	assert(pageTest(1000, 1000, 10), &pageTestReulst{100, 1000})
+	assert(pageTest(1000, 1000, 50), &pageTestReulst{20, 1000})
+	assert(pageTest(1000, 1000, 1000), &pageTestReulst{1, 1000})
+}
+
+func pageTest(max int, total int, perPage int) *pageTestReulst {
+	Setup()
+	defer Teardown()
+
+	// create input
+	lastPage := ((total - 1) / perPage) + 1
+	url, _ := url.Parse(server.URL)
+	repo = NewRepo(NewSearch(option(max, perPage), url, ""))
+
+	// create output
+	mux.HandleFunc("/search/repositories", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Link", headerLink(perPage, lastPage))
+		fmt.Fprintf(w, `{"total_count": %d, "items": [{"id":1}]}`, total)
+	})
+
+	// test
+	_, printLastPage, printMax := repo.search.First()
+
+	return &pageTestReulst{
+		printLastPage: printLastPage,
+		printMax:      printMax,
+	}
+}
+
 func headerLink(perPage int, lastPage int) string {
 	link := func(per int, page int, rel string) string {
 		url := "https://api.github.com/search/repositories"
@@ -30,63 +89,50 @@ func option(max int, perPage int) *SearchOpt {
 		max:     max}
 }
 
-type pageTestReulst struct {
-	repoLen  int
-	lastPage int
-	max      int
+type requestTestReulst struct {
+	repolen  int
+	printMax int
 }
 
-func pageTest(max int, total int, perPage int, lastPage int) *pageTestReulst {
-	link := headerLink(perPage, lastPage)
-	opts := option(max, perPage)
+func TestSearch_Request(t *testing.T) {
+	assert := func(result interface{}, want interface{}) {
+		if !reflect.DeepEqual(result, want) {
+			t.Errorf("Returned %+v, want %+v", result, want)
+		}
+	}
 
+	assert(requestTest(t), &requestTestReulst{2, 2})
+
+}
+
+func requestTest(t *testing.T) *requestTestReulst {
+	Setup()
+	defer Teardown()
+
+	// create input
+	max := 1000
+	perPage := 100
 	url, _ := url.Parse(server.URL)
+	repo = NewRepo(NewSearch(option(max, perPage), url, ""))
 
-	repo = NewRepo(NewSearch(opts, url, ""))
-
+	// create output
 	mux.HandleFunc("/search/repositories", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Link", link)
-		fmt.Fprintf(w, `{"total_count": %d, "items": [{"id":1},{"id":2}]}`, total)
+		testMethod(t, r, "GET")
+		testFormValues(t, r, values{
+			"q":        "ghs",
+			"sort":     "best match",
+			"order":    "desc",
+			"page":     "1",
+			"per_page": "100",
+		})
+		fmt.Fprint(w, `{"total_count": 2, "items": [{"id":1},{"id":2}]}`)
 	})
-	repos, lastPage, max := repo.search.First()
 
-	return &pageTestReulst{
-		repoLen:  len(repos),
-		lastPage: lastPage,
-		max:      max,
+	// test
+	repo, _, printMax := repo.search.First()
+
+	return &requestTestReulst{
+		repolen:  len(repo),
+		printMax: printMax,
 	}
 }
-
-func TestSearch_Page(t *testing.T) {
-	result := pageTest(1000, 1000, 100, 3)
-	want := &pageTestReulst{
-		repoLen:  2,
-		lastPage: 3,
-		max:      1000,
-	}
-	if !reflect.DeepEqual(result, want) {
-		t.Errorf("TestSearch_Page returned %+v, want %+v", result, want)
-	}
-}
-
-// func TestSearch_Link(t *testing.T) {
-
-// 	mux.HandleFunc("/search/repositories", func(w http.ResponseWriter, r *http.Request) {
-// 		testMethod(t, r, "GET")
-// 		testFormValues(t, r, values{
-// 			"q":        "ghs",
-// 			"sort":     "best match",
-// 			"order":    "desc",
-// 			"page":     "1",
-// 			"per_page": "100",
-// 		})
-// 		w.Header().Add("Link", link)
-// 		fmt.Fprint(w, `{"total_count": 1000, "items": [{"id":1},{"id":2}]}`)
-// 	})
-
-// 	repos, lastPage, max := repo.search.First()
-
-// 	if !(max == 1000 && lastPage == 3 && len(repos) == 2) {
-// 		t.Errorf("repo.search.First() max %+v, lastPage %+v, len(repos) %+v\n", max, lastPage, len(repos))
-// 	}
-// }

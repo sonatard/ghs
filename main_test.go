@@ -11,10 +11,10 @@ import (
 
 func TestMain(m *testing.M) {
 
-	setup()
+	//	setup()
 
 	code := m.Run()
-	teardown()
+	//	teardown()
 
 	os.Exit(code)
 }
@@ -25,12 +25,12 @@ var (
 	mux    *http.ServeMux
 )
 
-func setup() {
+func Setup() {
 	mux = http.NewServeMux()
 	server = httptest.NewServer(mux)
 }
 
-func teardown() {
+func Teardown() {
 	server.Close()
 }
 

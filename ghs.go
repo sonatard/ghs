@@ -18,7 +18,7 @@ const (
 )
 
 func main() {
-	flags, err := NewFlags()
+	flags, err := NewFlags(os.Args[1:])
 	if err != nil {
 		flags.printHelp()
 		os.Exit(ExitCodeError)
