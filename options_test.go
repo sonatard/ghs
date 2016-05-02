@@ -13,33 +13,6 @@ type parseTestReulst struct {
 	sOpt     *SearchOpt
 }
 
-func ExampleHelp() {
-	_ = testParse("ghs -h")
-	// Output:
-	// Usage:
-	//         ghs [OPTION] "QUERY"
-
-	//         Application Options:
-	//         -f, --fields=     limits what fields are searched. 'name', 'description', or 'readme'.
-	//                 -s, --sort=       The sort field. 'stars', 'forks', or 'updated'. (default: best match)
-	//         -o, --order=      The sort order. 'asc' or 'desc'. (default: desc)
-	//         -l, --language=   searches repositories based on the language they’re written in.
-	//                 -u, --user=       limits searches to a specific user name.
-	//                 -r, --repo=       limits searches to a specific repository.
-	//                 -m, --max=        limits number of result. range 1-1000 (default: 100)
-	//         -v, --version     print version infomation and exit.
-	//                 -e, --enterprise= search from github enterprise.
-	//                 -t, --token=      Github API token to avoid Github API rate
-	//         -h, --help=       Show this help message
-
-	//         Github search APIv3 QUERY infomation:
-	// https://developer.github.com/v3/search/
-	// https://help.github.com/articles/searching-repositories/
-
-	// Version:
-	//         ghs 0.0.7 (https://github.com/sona-tar/ghs.git)
-}
-
 func TestOption_Parse(t *testing.T) {
 	assert := func(result interface{}, want interface{}) {
 		if !reflect.DeepEqual(result, want) {
