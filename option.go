@@ -69,10 +69,10 @@ func (f *Flags) ParseOption() (bool, int, *SearchOpt) {
 	}
 
 	buildQuery := func(opts CmdOptions, args []string) string {
-		query := args
+		var query []string
 
 		if opts.Fields != "" {
-			query = append(query, "in: "+opts.Fields)
+			query = append(query, "in:"+opts.Fields)
 		}
 		if opts.Language != "" {
 			query = append(query, "language:"+opts.Language)
@@ -83,6 +83,7 @@ func (f *Flags) ParseOption() (bool, int, *SearchOpt) {
 		if opts.Repository != "" {
 			query = append(query, "repo:"+opts.Repository)
 		}
+		query = append(query, args...)
 		return strings.Join(query, " ")
 	}
 

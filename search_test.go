@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -104,11 +105,12 @@ func TestSearch_Request(t *testing.T) {
 		}
 	}
 
-	assert(requestTest(t), &requestTestReulst{2, 2})
+	assert(firstRequestTest(t), &requestTestReulst{100, 102})
+	assert(secondRequestTest(t), 2)
 
 }
 
-func requestTest(t *testing.T) *requestTestReulst {
+func firstRequestTest(t *testing.T) *requestTestReulst {
 	Setup()
 	defer Teardown()
 
@@ -128,14 +130,47 @@ func requestTest(t *testing.T) *requestTestReulst {
 			"page":     "1",
 			"per_page": "100",
 		})
-		fmt.Fprint(w, `{"total_count": 2, "items": [{"id":1},{"id":2}]}`)
+		var items []string
+		for i := 1; i < 100+1; i++ {
+			items = append(items, fmt.Sprintf("{\"id\":%d}", i))
+		}
+		fmt.Fprintf(w, `{"total_count": 102, "items": [%s]}`, strings.Join(items, ","))
 	})
 
 	// test
-	repo, _, printMax := repo.search.First()
+	repos, _, printMax := repo.search.First()
 
 	return &requestTestReulst{
-		repolen:  len(repo),
+		repolen:  len(repos),
 		printMax: printMax,
 	}
+}
+
+func secondRequestTest(t *testing.T) int {
+	Setup()
+	defer Teardown()
+
+	// create input
+	max := 1000
+	perPage := 100
+	url, _ := url.Parse(server.URL)
+	repo = NewRepo(NewSearch(option(max, perPage, url, "")))
+
+	// create output
+	mux.HandleFunc("/search/repositories", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testFormValues(t, r, values{
+			"q":        "ghs",
+			"sort":     "best match",
+			"order":    "desc",
+			"page":     "2",
+			"per_page": "100",
+		})
+		fmt.Fprint(w, `{"total_count": 102, "items": [{"id":1},{"id":2}]}`)
+	})
+
+	// test
+	repos := repo.search.Exec(2)
+
+	return len(repos)
 }

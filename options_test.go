@@ -34,8 +34,9 @@ func TestOption_Parse(t *testing.T) {
 		baseURL: nil,
 		token:   "",
 	}
+
+	// normal query test
 	wantOpt := defaultOpt
-	fmt.Println("want : ", wantOpt)
 	assert(testParse("ghs SEARCH_WORD"), &parseTestReulst{false, ExitCodeOK, &wantOpt})
 	wantOpt = defaultOpt
 	wantOpt.sort = "stars"
@@ -52,6 +53,10 @@ func TestOption_Parse(t *testing.T) {
 	wantOpt = defaultOpt
 	wantOpt.token = "abcdefg"
 	assert(testParse("ghs -t abcdefg SEARCH_WORD"), &parseTestReulst{false, ExitCodeOK, &wantOpt})
+	wantOpt = defaultOpt
+	wantOpt.query = "in:name SEARCH_WORD"
+	fmt.Println("want : ", wantOpt)
+	assert(testParse("ghs -f name SEARCH_WORD"), &parseTestReulst{false, ExitCodeOK, &wantOpt})
 	wantOpt = defaultOpt
 	wantOpt.query = "user:sona-tar"
 	assert(testParse("ghs -u sona-tar"), &parseTestReulst{false, ExitCodeOK, &wantOpt})
