@@ -23,6 +23,7 @@ func main() {
 	flags, err := NewFlags(os.Args[1:])
 	// --help or error
 	if err != nil {
+		Debug("Error : help or parse error\n")
 		flags.PrintHelp()
 		CheckVersion(Version)
 		os.Exit(ExitCodeError)
@@ -38,6 +39,8 @@ func main() {
 	}
 	// error options
 	if exitCode == ExitCodeError {
+		Debug("Error : Parse option error flags.ParseOption()\n")
+		flags.PrintHelp()
 		CheckVersion(Version)
 		os.Exit(ExitCodeError)
 	}

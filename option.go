@@ -28,7 +28,7 @@ type CmdOptions struct {
 	Version    bool   `short:"v"  long:"version"    description:"print version infomation and exit."`
 	Enterprise string `short:"e"  long:"enterprise" description:"search from github enterprise."`
 	Token      string `short:"t"  long:"token"      description:"Github API token to avoid Github API rate "`
-	Help       string `short:"h"  long:"help"      description:"Show this help message"`
+	Help       string `short:"h"  long:"help"       description:"Show this help message"`
 }
 
 func NewFlags(args []string) (*Flags, error) {
@@ -52,6 +52,7 @@ func (f *Flags) ParseOption() (bool, int, *SearchOpt) {
 	}
 
 	if errorQuery(f.cmdOpts, f.args) {
+		Debug("Error : noargs & noopt\n")
 		return false, ExitCodeError, nil
 	}
 
@@ -61,11 +62,13 @@ func (f *Flags) ParseOption() (bool, int, *SearchOpt) {
 
 	var baseURL *url.URL
 	if f.cmdOpts.Enterprise != "" {
-		url, err := url.Parse(f.cmdOpts.Enterprise)
+		eURL, err := url.Parse(f.cmdOpts.Enterprise)
+		Debug("%#v\n", eURL)
 		if err != nil {
+			Debug(`Error : Parse "%v"`+"\n", f.cmdOpts.Enterprise)
 			return false, ExitCodeError, nil
 		}
-		baseURL = url
+		baseURL = eURL
 	}
 
 	buildQuery := func(opts CmdOptions, args []string) string {

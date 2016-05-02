@@ -154,7 +154,7 @@ func secondRequestTest(t *testing.T) int {
 	max := 1000
 	perPage := 100
 	url, _ := url.Parse(server.URL)
-	repo = NewRepo(NewSearch(option(max, perPage, url, "")))
+	repo = NewRepo(NewSearch(option(max, perPage, url, "abcdefg")))
 
 	// create output
 	mux.HandleFunc("/search/repositories", func(w http.ResponseWriter, r *http.Request) {
