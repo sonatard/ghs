@@ -18,13 +18,17 @@ func NewRepo(s *Search) *Repo {
 	return &Repo{s, 0, 0}
 }
 
-func (r *Repo) Search() (<-chan []github.Repository, <-chan bool) {
+func (r *Repo) Search() (<-chan []github.Repository, <-chan bool, <-chan error) {
 	var wg sync.WaitGroup
 	reposBuff := make(chan []github.Repository, 1000)
 	fin := make(chan bool)
+	errChan := make(chan error)
 
 	// 1st search
-	repos, lastPage, max := r.search.First()
+	repos, lastPage, max, err := r.search.First()
+	if err != nil {
+		errChan <- err
+	}
 	r.maxItem = max
 
 	// notify main thread of first search result
@@ -37,7 +41,11 @@ func (r *Repo) Search() (<-chan []github.Repository, <-chan bool) {
 			wg.Add(1)
 			go func(p int) {
 				// notify main thread of 2nd - 10th search result
-				reposBuff <- r.search.Exec(p)
+				repos, err := r.search.Exec(p)
+				if err != nil {
+					errChan <- err
+				}
+				reposBuff <- repos
 				wg.Done()
 			}(page)
 		}
@@ -49,7 +57,7 @@ func (r *Repo) Search() (<-chan []github.Repository, <-chan bool) {
 
 	Debug("main thread return\n")
 
-	return reposBuff, fin
+	return reposBuff, fin, errChan
 }
 
 func (r *Repo) Print(repos []github.Repository) (end bool) {

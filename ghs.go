@@ -69,7 +69,7 @@ func main() {
 	sOpt.token = getToken(sOpt.token)
 
 	repo := NewRepo(NewSearch(sOpt))
-	reposChan, oneRequestFin := repo.Search()
+	reposChan, oneRequestFin, errChan := repo.Search()
 
 	Debug("main thread select start...\n")
 	var repos []github.Repository
@@ -88,6 +88,11 @@ func main() {
 				Debug("over max\n")
 				return
 			}
+		case <-errChan:
+			Debug("main thread chan err\n")
+			fmt.Printf("Error: Search Error\n")
+			fmt.Println(errChan)
+			return
 		}
 	}
 }

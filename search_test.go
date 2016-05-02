@@ -60,7 +60,7 @@ func pageTest(max int, total int, perPage int) *pageTestReulst {
 	})
 
 	// test
-	_, printLastPage, printMax := repo.search.First()
+	_, printLastPage, printMax, _ := repo.search.First()
 
 	return &pageTestReulst{
 		printLastPage: printLastPage,
@@ -105,23 +105,9 @@ func TestSearch_Request(t *testing.T) {
 		}
 	}
 
-	assert(firstRequestTest(t), &requestTestReulst{100, 102})
-	assert(secondRequestTest(t), 2)
-
-}
-
-func firstRequestTest(t *testing.T) *requestTestReulst {
-	Setup()
-	defer Teardown()
-
-	// create input
-	max := 1000
-	perPage := 100
-	url, _ := url.Parse(server.URL)
-	repo = NewRepo(NewSearch(option(max, perPage, url, "")))
-
-	// create output
-	mux.HandleFunc("/search/repositories", func(w http.ResponseWriter, r *http.Request) {
+	var handler func(w http.ResponseWriter, r *http.Request)
+	// Normal response
+	handler = func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		testFormValues(t, r, values{
 			"q":        "ghs",
@@ -135,18 +121,82 @@ func firstRequestTest(t *testing.T) *requestTestReulst {
 			items = append(items, fmt.Sprintf("{\"id\":%d}", i))
 		}
 		fmt.Fprintf(w, `{"total_count": 102, "items": [%s]}`, strings.Join(items, ","))
-	})
+	}
+	ret, _ := firstRequestTest(t, handler)
+	assert(ret, &requestTestReulst{100, 102})
+
+	// Invalid response
+	handler = func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testFormValues(t, r, values{
+			"q":        "ghs",
+			"sort":     "best match",
+			"order":    "desc",
+			"page":     "1",
+			"per_page": "100",
+		})
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusNotFound)
+	}
+	ret, err := firstRequestTest(t, handler)
+	assert(strings.Contains(err.Error(), "404"), true)
+	assert(ret, &requestTestReulst{0, 0})
+
+	// Normal response
+	handler = func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testFormValues(t, r, values{
+			"q":        "ghs",
+			"sort":     "best match",
+			"order":    "desc",
+			"page":     "2",
+			"per_page": "100",
+		})
+		fmt.Fprint(w, `{"total_count": 102, "items": [{"id":1},{"id":2}]}`)
+	}
+	repoNum, _ := secondRequestTest(t, handler)
+	assert(repoNum, 2)
+	// Invalid response
+	handler = func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testFormValues(t, r, values{
+			"q":        "ghs",
+			"sort":     "best match",
+			"order":    "desc",
+			"page":     "2",
+			"per_page": "100",
+		})
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusNotFound)
+	}
+	repoNum, err = secondRequestTest(t, handler)
+	assert(strings.Contains(err.Error(), "404"), true)
+	assert(repoNum, 0)
+}
+
+func firstRequestTest(t *testing.T, handler func(http.ResponseWriter, *http.Request)) (*requestTestReulst, error) {
+	Setup()
+	defer Teardown()
+
+	// create input
+	max := 1000
+	perPage := 100
+	url, _ := url.Parse(server.URL)
+	repo = NewRepo(NewSearch(option(max, perPage, url, "")))
+
+	// create output
+	mux.HandleFunc("/search/repositories", handler)
 
 	// test
-	repos, _, printMax := repo.search.First()
+	repos, _, printMax, err := repo.search.First()
 
 	return &requestTestReulst{
 		repolen:  len(repos),
 		printMax: printMax,
-	}
+	}, err
 }
 
-func secondRequestTest(t *testing.T) int {
+func secondRequestTest(t *testing.T, handler func(http.ResponseWriter, *http.Request)) (int, error) {
 	Setup()
 	defer Teardown()
 
@@ -157,20 +207,10 @@ func secondRequestTest(t *testing.T) int {
 	repo = NewRepo(NewSearch(option(max, perPage, url, "abcdefg")))
 
 	// create output
-	mux.HandleFunc("/search/repositories", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, "GET")
-		testFormValues(t, r, values{
-			"q":        "ghs",
-			"sort":     "best match",
-			"order":    "desc",
-			"page":     "2",
-			"per_page": "100",
-		})
-		fmt.Fprint(w, `{"total_count": 102, "items": [{"id":1},{"id":2}]}`)
-	})
+	mux.HandleFunc("/search/repositories", handler)
 
 	// test
-	repos := repo.search.Exec(2)
+	repos, err := repo.search.Exec(2)
 
-	return len(repos)
+	return len(repos), err
 }

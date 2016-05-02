@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
-	"os"
 
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
@@ -52,12 +50,10 @@ func repoSearch(client *github.Client, page int, opt *SearchOpt) (*github.Reposi
 	return client.Search.Repositories(opt.query, opts)
 }
 
-func (s *Search) First() (repos []github.Repository, lastPage int, maxItem int) {
+func (s *Search) First() (repos []github.Repository, lastPage int, maxItem int, err error) {
 	ret, resp, err := repoSearch(s.client, 1, s.option)
 	if err != nil {
-		fmt.Printf("Search Error!! query : %s\n", s.option.query)
-		fmt.Println(err)
-		os.Exit(1)
+		return nil, 0, 0, err
 	}
 
 	Debug("main thread repos length %d\n", len(ret.Repositories))
@@ -76,20 +72,19 @@ func (s *Search) First() (repos []github.Repository, lastPage int, maxItem int) 
 		last = resp.LastPage
 	}
 
-	return ret.Repositories, last, max
+	return ret.Repositories, last, max, nil
 }
 
-func (s *Search) Exec(page int) (repos []github.Repository) {
+func (s *Search) Exec(page int) (repos []github.Repository, err error) {
 	Debug("Page%d go func search start\n", page)
 
 	Debug("Page%d query : %s\n", page, s.option.query)
 	ret, _, err := repoSearch(s.client, page, s.option)
 	if err != nil {
-		fmt.Printf("Search Error!! query : %s\n", s.option.query)
-		fmt.Println(err)
+		return nil, err
 	}
 	Debug("Page%d go func search result length %d\n", page, len(ret.Repositories))
 	Debug("Page%d go func search end\n", page)
 
-	return ret.Repositories
+	return ret.Repositories, nil
 }
