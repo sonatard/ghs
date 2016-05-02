@@ -50,7 +50,7 @@ func pageTest(max int, total int, perPage int) *pageTestReulst {
 	// create input
 	lastPage := ((total - 1) / perPage) + 1
 	url, _ := url.Parse(server.URL)
-	repo = NewRepo(NewSearch(option(max, perPage), url, ""))
+	repo = NewRepo(NewSearch(option(max, perPage, url, "")))
 
 	// create output
 	mux.HandleFunc("/search/repositories", func(w http.ResponseWriter, r *http.Request) {
@@ -80,13 +80,16 @@ func headerLink(perPage int, lastPage int) string {
 
 }
 
-func option(max int, perPage int) *SearchOpt {
+func option(max int, perPage int, url *url.URL, token string) *SearchOpt {
 	return &SearchOpt{
 		sort:    "best match",
 		order:   "desc",
 		query:   "ghs",
 		perPage: perPage,
-		max:     max}
+		max:     max,
+		baseURL: url,
+		token:   token,
+	}
 }
 
 type requestTestReulst struct {
@@ -113,7 +116,7 @@ func requestTest(t *testing.T) *requestTestReulst {
 	max := 1000
 	perPage := 100
 	url, _ := url.Parse(server.URL)
-	repo = NewRepo(NewSearch(option(max, perPage), url, ""))
+	repo = NewRepo(NewSearch(option(max, perPage, url, "")))
 
 	// create output
 	mux.HandleFunc("/search/repositories", func(w http.ResponseWriter, r *http.Request) {

@@ -21,20 +21,22 @@ type SearchOpt struct {
 	query   string
 	max     int
 	perPage int
+	baseURL *url.URL
+	token   string
 }
 
-func NewSearch(opt *SearchOpt, baseURL *url.URL, token string) *Search {
+func NewSearch(opt *SearchOpt) *Search {
 	var tc *http.Client
 
-	if token != "" {
-		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
+	if opt.token != "" {
+		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: opt.token})
 		tc = oauth2.NewClient(oauth2.NoContext, ts)
 	}
 
 	cli := github.NewClient(tc)
 
-	if baseURL != nil {
-		cli.BaseURL = baseURL
+	if opt.baseURL != nil {
+		cli.BaseURL = opt.baseURL
 	}
 
 	return &Search{client: cli, option: opt}

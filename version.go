@@ -7,7 +7,7 @@ import (
 	"github.com/tcnksm/go-latest"
 )
 
-func checkVersion(ver string) {
+func CheckVersion(ver string) {
 	githubTag := &latest.GithubTag{
 		Owner:      "sona-tar",
 		Repository: "ghs",

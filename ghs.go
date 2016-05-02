@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
 	"github.com/google/go-github/github"
+	"github.com/motemen/go-gitconfig"
 )
 
 // Version is ghs version number
@@ -19,17 +21,51 @@ const (
 
 func main() {
 	flags, err := NewFlags(os.Args[1:])
+	// --help or error
 	if err != nil {
-		flags.printHelp()
+		flags.PrintHelp()
+		CheckVersion(Version)
 		os.Exit(ExitCodeError)
 	}
 
-	exit, exitCode, sOpt, url, token := flags.ParseOption()
-	if exit {
-		os.Exit(exitCode)
-	}
+	version, exitCode, sOpt := flags.ParseOption()
+	// --version
+	if version {
+		fmt.Printf("ghs %s\n", Version)
+		CheckVersion(Version)
+		os.Exit(ExitCodeOK)
 
-	repo := NewRepo(NewSearch(sOpt, url, token))
+	}
+	// error options
+	if exitCode == ExitCodeError {
+		CheckVersion(Version)
+		os.Exit(ExitCodeError)
+	}
+	getToken := func(optsToken string) string {
+		// -t or --token option
+		if optsToken != "" {
+			Debug("Github token get from option value\n")
+			return optsToken
+		}
+
+		// GITHUB_TOKEN environment
+		if token := os.Getenv("GITHUB_TOKEN"); token != "" {
+			Debug("Github token get from environment value\n")
+			return token
+		}
+
+		// github.token in gitconfig
+		if token, err := gitconfig.GetString("github.token"); err == nil {
+			Debug("Github token get from gitconfig value\n")
+			return token
+		}
+
+		Debug("Github token not found\n")
+		return ""
+	}
+	sOpt.token = getToken(sOpt.token)
+
+	repo := NewRepo(NewSearch(sOpt))
 	reposChan, oneRequestFin := repo.Search()
 
 	Debug("main thread select start...\n")
