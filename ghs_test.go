@@ -28,7 +28,7 @@ func Test_Ghs(t *testing.T) {
 		w.Header().Add("Link", HeaderLink(100, 10))
 		var items []string
 		for i := 1; i < 100+1; i++ {
-			items = append(items, fmt.Sprintf(`{"id":%d, "full_name": "test/search_word%d"}`, i, i))
+			items = append(items, fmt.Sprintf(`{"id":%d, "full_name": "test/search_word%d", "description":"%d"}`, i, i, i))
 		}
 		fmt.Fprintf(w, `{"total_count": 1000, "items": [%s]}`, strings.Join(items, ","))
 	}
@@ -74,7 +74,7 @@ func Test_GhsTokenTest(t *testing.T) {
 		w.Header().Add("Link", HeaderLink(100, 10))
 		var items []string
 		for i := 1; i < 100+1; i++ {
-			items = append(items, fmt.Sprintf(`{"id":%d, "full_name": "test/search_word%d"}`, i, i))
+			items = append(items, fmt.Sprintf(`{"id":%d, "full_name": "test/search_word%d", "description":"%d"}`, i, i, i))
 		}
 		fmt.Fprintf(w, `{"total_count": 1000, "items": [%s]}`, strings.Join(items, ","))
 	}
