@@ -118,7 +118,7 @@ func TestSearch_Request(t *testing.T) {
 		})
 		var items []string
 		for i := 1; i < 100+1; i++ {
-			items = append(items, fmt.Sprintf("{\"id\":%d}", i))
+			items = append(items, fmt.Sprintf(`{"id":%d, "description":"%d"}`, i, i))
 		}
 		fmt.Fprintf(w, `{"total_count": 102, "items": [%s]}`, strings.Join(items, ","))
 	}
