@@ -182,3 +182,18 @@ func Example_PrintHelp() {
 	// Version:
 	//   ghs 0.0.7 (https://github.com/sona-tar/ghs.git)
 }
+
+func Example_PrintfDebug() {
+	os.Setenv("GHS_PRINT", "yes")
+	Printf("test")
+	// Output:
+	// test
+	os.Setenv("GHS_PRINT", "no")
+
+	os.Setenv("GHS_DEBUG", "yes")
+
+	Debug("test")
+	// Output:
+	// test
+	os.Setenv("GHS_DEBUG", "")
+}
