@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/google/go-github/github"
 	"github.com/motemen/go-gitconfig"
 )
 
@@ -20,7 +19,16 @@ const (
 )
 
 func main() {
-	flags, err := NewFlags(os.Args[1:])
+	num, err := ghs(os.Args[1:])
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(ExitCodeError)
+	}
+	Debug("Print %d\n", num)
+}
+
+func ghs(args []string) (int, error) {
+	flags, err := NewFlags(args)
 	// --help or error
 	if err != nil {
 		Debug("Error : help or parse error\n")
@@ -69,30 +77,27 @@ func main() {
 	sOpt.token = getToken(sOpt.token)
 
 	repo := NewRepo(NewSearch(sOpt))
-	reposChan, oneRequestFin, errChan := repo.Search()
+	reposChan, errChan := repo.Search()
 
 	Debug("main thread select start...\n")
-	var repos []github.Repository
+	reposNum := 0
+
 	for {
 		select {
 		case oneReqRepos := <-reposChan:
 			Debug("main thread chan reposChan\n")
 			Debug("main thread oneReqRepos length %d\n", len(oneReqRepos))
-
-			repos = append(repos, oneReqRepos...)
-			Debug("main thread repos length %d\n", len(repos))
-		case <-oneRequestFin:
-			Debug("main thread chan fin\n")
-			end := repo.Print(repos)
+			var end bool
+			end, reposNum = repo.Print(oneReqRepos)
+			Debug("reposNum : %d\n", reposNum)
 			if end {
 				Debug("over max\n")
-				return
+				return reposNum, nil
+
 			}
-		case <-errChan:
+		case err := <-errChan:
 			Debug("main thread chan err\n")
-			fmt.Printf("Error: Search Error\n")
-			fmt.Println(errChan)
-			return
+			return 0, err
 		}
 	}
 }

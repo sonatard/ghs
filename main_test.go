@@ -26,6 +26,7 @@ var (
 )
 
 func Setup() {
+	os.Setenv("GHS_PRINT", "no")
 	mux = http.NewServeMux()
 	server = httptest.NewServer(mux)
 }

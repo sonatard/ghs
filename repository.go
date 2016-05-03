@@ -18,49 +18,52 @@ func NewRepo(s *Search) *Repo {
 	return &Repo{s, 0, 0}
 }
 
-func (r *Repo) Search() (<-chan []github.Repository, <-chan bool, <-chan error) {
+func (r *Repo) Search() (<-chan []github.Repository, <-chan error) {
 	var wg sync.WaitGroup
-	reposBuff := make(chan []github.Repository, 1000)
-	fin := make(chan bool)
-	errChan := make(chan error)
+	reposBuff := make(chan []github.Repository, 1)
+	errChan := make(chan error, 1)
 
 	// 1st search
+
 	repos, lastPage, max, err := r.search.First()
 	if err != nil {
+		Debug("Error First()\n")
 		errChan <- err
+		return reposBuff, errChan
 	}
 	r.maxItem = max
-
 	// notify main thread of first search result
 	reposBuff <- repos
 
 	// 2nd - 10th search
 	go func() {
 		for page := 2; page < lastPage+1; page++ {
-			Debug("sub thread %d\n", page)
+			Debug("sub thread start %d\n", page)
 			wg.Add(1)
 			go func(p int) {
 				// notify main thread of 2nd - 10th search result
-				repos, err := r.search.Exec(p)
+				rs, err := r.search.Exec(p)
 				if err != nil {
+					Debug("sub thread error %d\n", p)
 					errChan <- err
 				}
-				reposBuff <- repos
+				reposBuff <- rs
 				wg.Done()
+				Debug("sub thread end %d\n", p)
 			}(page)
 		}
 		Debug("sub thread wait...\n")
 		wg.Wait()
 		Debug("sub thread wakeup!!\n")
-		fin <- true
+		close(reposBuff)
 	}()
 
 	Debug("main thread return\n")
 
-	return reposBuff, fin, errChan
+	return reposBuff, errChan
 }
 
-func (r *Repo) Print(repos []github.Repository) (end bool) {
+func (r *Repo) Print(repos []github.Repository) (bool, int) {
 	Debug("repos length %d\n", len(repos))
 	repoNameMaxLen := 0
 	for _, repo := range repos {
@@ -90,10 +93,10 @@ func (r *Repo) Print(repos []github.Repository) (end bool) {
 		r.printCount++
 		Debug("printCount %d, r.maxItem %d\n", r.printCount, r.maxItem)
 		if r.printCount >= r.maxItem {
-			return true
+			return true, r.printCount
 		}
 	}
-	return false
+	return false, r.printCount
 }
 
 func printf(format string, args ...interface{}) {

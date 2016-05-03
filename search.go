@@ -47,12 +47,14 @@ func repoSearch(client *github.Client, page int, opt *SearchOpt) (*github.Reposi
 		TextMatch:   false,
 		ListOptions: github.ListOptions{PerPage: opt.perPage, Page: page},
 	}
-	return client.Search.Repositories(opt.query, opts)
+	ret, resp, err := client.Search.Repositories(opt.query, opts)
+	return ret, resp, err
 }
 
 func (s *Search) First() (repos []github.Repository, lastPage int, maxItem int, err error) {
 	ret, resp, err := repoSearch(s.client, 1, s.option)
 	if err != nil {
+		Debug("error repoSearch()\n")
 		return nil, 0, 0, err
 	}
 

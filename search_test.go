@@ -55,7 +55,7 @@ func pageTest(max int, total int, perPage int) *pageTestReulst {
 
 	// create output
 	mux.HandleFunc("/search/repositories", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Link", headerLink(perPage, lastPage))
+		w.Header().Add("Link", HeaderLink(perPage, lastPage))
 		fmt.Fprintf(w, `{"total_count": %d, "items": [{"id":1}]}`, total)
 	})
 
@@ -68,7 +68,7 @@ func pageTest(max int, total int, perPage int) *pageTestReulst {
 	}
 }
 
-func headerLink(perPage int, lastPage int) string {
+func HeaderLink(perPage int, lastPage int) string {
 	link := func(per int, page int, rel string) string {
 		url := "https://api.github.com/search/repositories"
 		query := fmt.Sprintf("?q=ghs&per_page=%d&page=%d", per, page)
