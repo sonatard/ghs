@@ -59,10 +59,6 @@ func Test_Ghs(t *testing.T) {
 	assert(num, 100)
 	assert(err, nil)
 
-	num, err = ghs(strings.Split(fmt.Sprintf("-t abcdefg -e %s -m 100 SEARCH_WORD", server.URL), " "))
-	assert(num, 100)
-	assert(err, nil)
-
 	os.Setenv("GITHUB_TOKEN", "abcdefg")
 	num, err = ghs(strings.Split(fmt.Sprintf("-e %s -m 100 SEARCH_WORD", server.URL), " "))
 	assert(num, 100)
