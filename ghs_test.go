@@ -139,11 +139,46 @@ func Test_GhsInvalidResponse(t *testing.T) {
 	assert(strings.Contains(err.Error(), "404"), true)
 }
 
-func Example_checkVersion() {
+func Example_CheckVersion() {
 	os.Setenv("GHS_PRINT", "yes")
+	defer os.Setenv("GHS_PRINT", "no")
+
 	CheckVersion("0.0.1")
 	// Output:
 	// 0.0.1 is not latest, you should upgrade to 0.0.7
 	// -> $ brew update && brew upgrade sona-tar/tools/ghs
-	os.Setenv("GHS_PRINT", "no")
+}
+
+func Example_PrintHelp() {
+	os.Setenv("GHS_PRINT", "yes")
+	defer os.Setenv("GHS_PRINT", "no")
+	args := strings.Split("ghs -h", " ")[1:]
+	flags, _ := NewFlags(args)
+	flags.PrintHelp()
+	// Output:
+	// Usage:
+	//   ghs [OPTION] "QUERY"
+	//
+	// Application Options:
+	//   -f, --fields=     limits what fields are searched. 'name', 'description', or
+	//                     'readme'.
+	//   -s, --sort=       The sort field. 'stars', 'forks', or 'updated'. (default:
+	//                     best match)
+	//   -o, --order=      The sort order. 'asc' or 'desc'. (default: desc)
+	//   -l, --language=   searches repositories based on the language they’re
+	//                     written in.
+	//   -u, --user=       limits searches to a specific user name.
+	//   -r, --repo=       limits searches to a specific repository.
+	//   -m, --max=        limits number of result. range 1-1000 (default: 100)
+	//   -v, --version     print version infomation and exit.
+	//   -e, --enterprise= search from github enterprise.
+	//   -t, --token=      Github API token to avoid Github API rate
+	//   -h, --help=       Show this help message
+	//
+	// Github search APIv3 QUERY infomation:
+	//   https://developer.github.com/v3/search/
+	//   https://help.github.com/articles/searching-repositories/
+	//
+	// Version:
+	//   ghs 0.0.7 (https://github.com/sona-tar/ghs.git)
 }
