@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	"sync"
 
 	"github.com/google/go-github/github"
@@ -75,17 +73,17 @@ func (r *Repo) Print(repos []github.Repository) (bool, int) {
 
 	printLine := func(repo github.Repository) {
 		if repo.FullName != nil {
-			printf("%v", *repo.FullName)
+			Printf("%v", *repo.FullName)
 		}
-		printf("    ")
+		Printf("    ")
 		paddingLen := repoNameMaxLen - len(*repo.FullName)
 		for i := 0; i < paddingLen; i++ {
-			printf(" ")
+			Printf(" ")
 		}
 		if repo.Description != nil {
-			printf("%v", *repo.Description)
+			Printf("%v", *repo.Description)
 		}
-		printf("\n")
+		Printf("\n")
 	}
 
 	for _, repo := range repos {
@@ -97,10 +95,4 @@ func (r *Repo) Print(repos []github.Repository) (bool, int) {
 		}
 	}
 	return false, r.printCount
-}
-
-func printf(format string, args ...interface{}) {
-	if os.Getenv("GHS_PRINT") != "no" {
-		fmt.Printf(format, args...)
-	}
 }

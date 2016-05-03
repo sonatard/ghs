@@ -103,13 +103,15 @@ func (f *Flags) ParseOption() (bool, int, *SearchOpt) {
 }
 
 func (f *Flags) PrintHelp() {
-	f.parser.WriteHelp(os.Stdout)
-	fmt.Printf("\n")
-	fmt.Printf("Github search APIv3 QUERY infomation:\n")
-	fmt.Printf("  https://developer.github.com/v3/search/\n")
-	fmt.Printf("  https://help.github.com/articles/searching-repositories/\n")
-	fmt.Printf("\n")
-	fmt.Printf("Version:\n")
-	fmt.Printf("  ghs %s (https://github.com/sona-tar/ghs.git)\n", Version)
-	fmt.Printf("\n")
+	if os.Getenv("GHS_PRINT") != "no" {
+		f.parser.WriteHelp(os.Stdout)
+		fmt.Printf("\n")
+		fmt.Printf("Github search APIv3 QUERY infomation:\n")
+		fmt.Printf("  https://developer.github.com/v3/search/\n")
+		fmt.Printf("  https://help.github.com/articles/searching-repositories/\n")
+		fmt.Printf("\n")
+		fmt.Printf("Version:\n")
+		fmt.Printf("  ghs %s (https://github.com/sona-tar/ghs.git)\n", Version)
+		fmt.Printf("\n")
+	}
 }

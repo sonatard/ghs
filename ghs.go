@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -25,6 +26,7 @@ func main() {
 		os.Exit(ExitCodeError)
 	}
 	Debug("Print %d\n", num)
+	os.Exit(ExitCodeOK)
 }
 
 func ghs(args []string) (int, error) {
@@ -32,17 +34,17 @@ func ghs(args []string) (int, error) {
 	// --help or error
 	if err != nil {
 		Debug("Error : help or parse error\n")
-		flags.PrintHelp()
 		CheckVersion(Version)
-		os.Exit(ExitCodeError)
+		flags.PrintHelp()
+		return 0, errors.New("help or parse error")
 	}
 
 	version, exitCode, sOpt := flags.ParseOption()
 	// --version
 	if version {
-		fmt.Printf("ghs %s\n", Version)
+		Printf("ghs %s\n", Version)
 		CheckVersion(Version)
-		os.Exit(ExitCodeOK)
+		return 0, nil
 
 	}
 	// error options
@@ -50,7 +52,7 @@ func ghs(args []string) (int, error) {
 		Debug("Error : Parse option error flags.ParseOption()\n")
 		flags.PrintHelp()
 		CheckVersion(Version)
-		os.Exit(ExitCodeError)
+		return 0, errors.New("Parse option error.")
 	}
 	getToken := func(optsToken string) string {
 		// -t or --token option
@@ -99,6 +101,12 @@ func ghs(args []string) (int, error) {
 			Debug("main thread chan err\n")
 			return 0, err
 		}
+	}
+}
+
+func Printf(format string, args ...interface{}) {
+	if os.Getenv("GHS_PRINT") != "no" {
+		fmt.Printf(format, args...)
 	}
 }
 
