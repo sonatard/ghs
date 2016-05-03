@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/mgutz/ansi"
 	"github.com/tcnksm/go-latest"
 )
 
@@ -16,9 +15,8 @@ func CheckVersion(ver string) {
 		}
 		res, _ := latest.Check(githubTag, ver)
 		if res.Outdated {
-			redstr := ansi.ColorFunc("red")
-			fmt.Printf(redstr(fmt.Sprintf("%s is not latest, you should upgrade to %s\n", Version, res.Current)))
-			fmt.Printf(redstr("-> $ brew update && brew upgrade sona-tar/tools/ghs"))
+			fmt.Printf(fmt.Sprintf("%s is not latest, you should upgrade to %s\n", ver, res.Current))
+			fmt.Printf("-> $ brew update && brew upgrade sona-tar/tools/ghs")
 		}
 	}
 }

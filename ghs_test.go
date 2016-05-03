@@ -138,3 +138,12 @@ func Test_GhsInvalidResponse(t *testing.T) {
 	assert(num, 0)
 	assert(strings.Contains(err.Error(), "404"), true)
 }
+
+func Example_checkVersion() {
+	os.Setenv("GHS_PRINT", "yes")
+	CheckVersion("0.0.1")
+	// Output:
+	// 0.0.1 is not latest, you should upgrade to 0.0.7
+	// -> $ brew update && brew upgrade sona-tar/tools/ghs
+	os.Setenv("GHS_PRINT", "no")
+}
