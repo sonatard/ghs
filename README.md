@@ -33,8 +33,6 @@ Application Options:
   -v, --version     print version infomation and exit.
   -e, --enterprise= search from github enterprise.
   -t, --token=      Github API token to avoid Github API rate limit
-
-Help Options:
   -h, --help        Show this help message
 
 Github search APIv3 QUERY infomation:
@@ -42,7 +40,7 @@ Github search APIv3 QUERY infomation:
    https://help.github.com/articles/searching-repositories/
 
 Version:
-   ghs 0.0.7 (https://github.com/sona-tar/ghs.git)
+   ghs 0.0.8 (https://github.com/sona-tar/ghs.git)
 ```
 
 Install

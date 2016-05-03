@@ -1,5 +1,7 @@
 CHANGES
 =======
+0.0.8 - May 03 2016
+  * [bugfix] Fix pararell search bugs
 0.0.7 - Dec 30 2015
   * [bugfix] Fix pararell search bugs
 0.0.6 - Dec 30 2015

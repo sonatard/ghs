@@ -10,7 +10,7 @@ import (
 )
 
 // Version is ghs version number
-const Version string = "0.0.7"
+const Version string = "0.0.8"
 
 const (
 	// ExitCodeOK is 0
