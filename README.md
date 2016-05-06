@@ -98,9 +98,10 @@ $ export GITHUB_TOKEN="....."
 $ git config --global github.token "....."
 ```
 
+Search Github repository and git clone
+===========
 
 With [motemen/ghq](https://github.com/motemen/ghq) and [peco/peco](https://github.com/peco/peco)
-===========
 
 ```sh
 ghs QUERY | peco | awk '{print $1}' | ghq import
@@ -117,18 +118,18 @@ function gpi () {
 
 gpi usage
 
-1. exec gpi QUERY
-2. filtering by peco
-3. clone repository by ghq
+```sh
+gpi dotfiles
+```
 
 ![](http://f.st-hatena.com/images/fotolife/s/sona-zip/20141029/20141029210952_original.gif?1414584687)
 
-more
+Remove local repository
 ===========
 
 ```zsh
 function gpr () {
-  ghq list --full-path | peco | xargs rm -r
+  ghq list --full-path | peco | xargs rm -ir
 }
 ```
 
@@ -136,6 +137,19 @@ function gpr () {
 gpr
 ```
 
+Search Github repository and open with browser
+===========
+
+```zsh
+function gho () {
+  [ "$#" -eq 0 ] && echo "Usage : gho QUERY" && return 1
+  ghs "$@" | peco | awk '{print "https://github.com/"$1}' | xargs open
+}
+```
+
+```sh
+gho dotfiles
+``` 
 
 Contributors
 ===========
