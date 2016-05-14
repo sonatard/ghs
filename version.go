@@ -16,7 +16,7 @@ func CheckVersion(ver string) {
 		res, _ := latest.Check(githubTag, ver)
 		if res.Outdated {
 			fmt.Printf(fmt.Sprintf("%s is not latest, you should upgrade to %s\n", ver, res.Current))
-			fmt.Printf("-> $ brew update && brew upgrade sona-tar/tools/ghs")
+			fmt.Printf("-> $ brew update && brew upgrade sona-tar/tools/ghs\n")
 		}
 	}
 }
