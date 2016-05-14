@@ -19,6 +19,7 @@ type Flags struct {
 // CmdOptions is ghs command line option list
 type CmdOptions struct {
 	Fields     string `short:"f"  long:"fields"     description:"limits what fields are searched. 'name', 'description', or 'readme'."`
+	Fork       string `short:"k"  long:"fork"       description:"Forked repositories icluded in results. 'true', 'only' or 'false'."`
 	Sort       string `short:"s"  long:"sort"       description:"The sort field. 'stars', 'forks', or 'updated'." default:"best match"`
 	Order      string `short:"o"  long:"order"      description:"The sort order. 'asc' or 'desc'." default:"desc"`
 	Language   string `short:"l"  long:"language"   description:"searches repositories based on the language they’re written in."`
@@ -76,6 +77,9 @@ func (f *Flags) ParseOption() (bool, int, *SearchOpt) {
 
 		if opts.Fields != "" {
 			query = append(query, "in:"+opts.Fields)
+		}
+		if opts.Fork != "" {
+			query = append(query, "fork:"+opts.Fork)
 		}
 		if opts.Language != "" {
 			query = append(query, "language:"+opts.Language)

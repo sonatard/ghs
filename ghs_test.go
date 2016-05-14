@@ -162,6 +162,8 @@ func Example_PrintHelp() {
 	// Application Options:
 	//   -f, --fields=     limits what fields are searched. 'name', 'description', or
 	//                     'readme'.
+	//   -k, --fork=       Forked repositories icluded in results. 'true', 'only' or
+	//                     'false'.
 	//   -s, --sort=       The sort field. 'stars', 'forks', or 'updated'. (default:
 	//                     best match)
 	//   -o, --order=      The sort order. 'asc' or 'desc'. (default: desc)
