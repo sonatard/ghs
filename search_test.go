@@ -125,6 +125,21 @@ func TestSearch_Request(t *testing.T) {
 	ret, _ := firstRequestTest(t, handler)
 	assert(ret, &requestTestReulst{100, 102})
 
+	// Repository not found
+	handler = func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		testFormValues(t, r, values{
+			"q":        "ghs",
+			"sort":     "best match",
+			"order":    "desc",
+			"page":     "1",
+			"per_page": "100",
+		})
+		fmt.Fprintf(w, `{"total_count": 0, "items": []}`)
+	}
+	ret, _ = firstRequestTest(t, handler)
+	assert(ret, &requestTestReulst{0, 0})
+
 	// Invalid response
 	handler = func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")

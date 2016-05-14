@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 	"net/url"
 
@@ -56,6 +57,9 @@ func (s *Search) First() (repos []github.Repository, lastPage int, maxItem int, 
 	if err != nil {
 		Debug("error repoSearch()\n")
 		return nil, 0, 0, err
+	}
+	if len(ret.Repositories) == 0 {
+		return nil, 0, 0, errors.New("Repository not found")
 	}
 
 	Debug("main thread repos length %d\n", len(ret.Repositories))

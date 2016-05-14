@@ -24,6 +24,7 @@ Usage:
 
 Application Options:
   -f, --fields=     limits what fields are searched. 'name', 'description', or 'readme'. (default: name,description)
+  -k, --fork=       Forked repositories included in results. 'true', 'only' or 'false'.
   -s, --sort=       The sort field. 'stars', 'forks', or 'updated'. (default: best match)
   -o, --order=      The sort order. 'asc' or 'desc'. (default: desc)
   -l, --language=   searches repositories based on the language they’re written in.
