@@ -70,8 +70,7 @@ func (r *Repo) Print(repos []github.Repository) (bool, int) {
 			repoNameMaxLen = repoNamelen
 		}
 	}
-
-	printLine := func(repo github.Repository) {
+	printLine := func(repo *github.Repository) {
 		if repo.FullName != nil {
 			Printf("%v", *repo.FullName)
 		}
@@ -85,9 +84,8 @@ func (r *Repo) Print(repos []github.Repository) (bool, int) {
 		}
 		Printf("\n")
 	}
-
 	for _, repo := range repos {
-		printLine(repo)
+		printLine(&repo)
 		r.printCount++
 		Debug("printCount %d, r.maxItem %d\n", r.printCount, r.maxItem)
 		if r.printCount >= r.maxItem {
