@@ -1,5 +1,8 @@
 CHANGES
 =======
+0.0.9 - May 14 2016
+  * [feature] Support fork option(-k, --fork)
+  * [bugfix] Stopped when search result is 0
 0.0.8 - May 03 2016
   * [bugfix] Fix pararell search bugs
 0.0.7 - Dec 30 2015

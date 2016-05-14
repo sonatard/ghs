@@ -41,7 +41,7 @@ Github search APIv3 QUERY infomation:
    https://help.github.com/articles/searching-repositories/
 
 Version:
-   ghs 0.0.8 (https://github.com/sona-tar/ghs.git)
+   ghs 0.0.9 (https://github.com/sona-tar/ghs.git)
 ```
 
 Install
@@ -150,7 +150,7 @@ function gho () {
 
 ```sh
 gho dotfiles
-``` 
+```
 
 Contributors
 ===========
