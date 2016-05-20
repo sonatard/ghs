@@ -102,13 +102,13 @@ $ git config --global github.token "....."
 Search Github repository and git clone
 ===========
 
-With [motemen/ghq](https://github.com/motemen/ghq) and [peco/peco](https://github.com/peco/peco)
+with [motemen/ghq](https://github.com/motemen/ghq) and [peco/peco](https://github.com/peco/peco)
 
 ```sh
 ghs QUERY | peco | awk '{print $1}' | ghq import
 ```
 
-crate zsh function
+create zsh function
 
 ```zsh
 function gpi () {
