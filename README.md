@@ -1,9 +1,9 @@
 ghs
 ======
 
-[![Build Status](https://travis-ci.org/sona-tar/ghs.svg?branch=master)](https://travis-ci.org/sona-tar/ghs)
-[![Coverage Status](https://coveralls.io/repos/github/sona-tar/ghs/badge.svg?branch=master)](https://coveralls.io/github/sona-tar/ghs?branch=master)
-[![Go Report Card](https://goreportcard.com/badge/github.com/sona-tar/ghs)](https://goreportcard.com/report/github.com/sona-tar/ghs)
+[![Build Status](https://travis-ci.org/sonatard/ghs.svg?branch=master)](https://travis-ci.org/sonatard/ghs)
+[![Coverage Status](https://coveralls.io/repos/github/sonatard/ghs/badge.svg)](https://coveralls.io/github/sonatard/ghs)
+[![Go Report Card](https://goreportcard.com/badge/github.com/sonatard/ghs)](https://goreportcard.com/report/github.com/sonatard/ghs)
 
 `ghs` - command-line utility for searching Github repositoy.
 
@@ -41,7 +41,7 @@ Github search APIv3 QUERY infomation:
    https://help.github.com/articles/searching-repositories/
 
 Version:
-   ghs 0.0.9 (https://github.com/sona-tar/ghs.git)
+   ghs 0.0.9 (https://github.com/sonatard/ghs.git)
 ```
 
 Install
@@ -50,11 +50,11 @@ Install
 [homebrew](http://brew.sh/index_ja.html), [linuxbrew](http://brew.sh/linuxbrew/)
 
 ```zsh
-brew install sona-tar/tools/ghs
+brew install sonatard/tools/ghs
 ```
 
 for Windows
-[Releases sona-tar/ghs](https://github.com/sona-tar/ghs/releases)
+[Releases sonatard/ghs](https://github.com/sonatard/ghs/releases)
 
 
 Usage
@@ -73,8 +73,8 @@ ghs -f name "dotfiles"
 
 Limits searches to a specific user.
 ```zsh
-ghs -f name -u sona-tar "dotfiles"
-sona-tar/dotfiles                       dotfiles
+ghs -f name -u sonatard "dotfiles"
+sonatard/dotfiles                       dotfiles
 ```
 
 Github Authentication to avoid Github API rate limit
@@ -161,4 +161,4 @@ Contributors
 Author
 ===========
 
-[sona-tar](https://github.com/sona-tar)
+[sonatard](https://github.com/sonatard)
