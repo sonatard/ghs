@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/google/go-github/github"
+	"context"
 )
 
 type Repo struct {
@@ -16,14 +17,14 @@ func NewRepo(s *Search) *Repo {
 	return &Repo{s, 0, 0}
 }
 
-func (r *Repo) Search() (<-chan []github.Repository, <-chan error) {
+func (r *Repo) Search(c context.Context) (<-chan []github.Repository, <-chan error) {
 	var wg sync.WaitGroup
 	reposBuff := make(chan []github.Repository, 1)
 	errChan := make(chan error, 1)
 
 	// 1st search
 
-	repos, lastPage, max, err := r.search.First()
+	repos, lastPage, max, err := r.search.First(c)
 	if err != nil {
 		Debug("Error First()\n")
 		errChan <- err
@@ -40,7 +41,7 @@ func (r *Repo) Search() (<-chan []github.Repository, <-chan error) {
 			wg.Add(1)
 			go func(p int) {
 				// notify main thread of 2nd - 10th search result
-				rs, err := r.search.Exec(p)
+				rs, err := r.search.Exec(c,p)
 				if err != nil {
 					Debug("sub thread error %d\n", p)
 					errChan <- err

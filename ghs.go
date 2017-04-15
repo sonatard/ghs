@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/motemen/go-gitconfig"
+	"context"
 )
 
 // Version is ghs version number
@@ -78,8 +79,9 @@ func ghs(args []string) (int, error) {
 	}
 	sOpt.token = getToken(sOpt.token)
 
-	repo := NewRepo(NewSearch(sOpt))
-	reposChan, errChan := repo.Search()
+	c := context.Background()
+	repo := NewRepo(NewSearch(c,sOpt))
+	reposChan, errChan := repo.Search(c)
 
 	Debug("main thread select start...\n")
 	reposNum := 0
