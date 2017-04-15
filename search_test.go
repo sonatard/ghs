@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -47,11 +48,12 @@ func TestSearch_Page(t *testing.T) {
 func pageTest(max int, total int, perPage int) *pageTestReulst {
 	Setup()
 	defer Teardown()
+	c := context.Background()
 
 	// create input
 	lastPage := ((total - 1) / perPage) + 1
 	url, _ := url.Parse(server.URL)
-	repo = NewRepo(NewSearch(option(max, perPage, url, "")))
+	repo = NewRepo(NewSearch(c, option(max, perPage, url, "")))
 
 	// create output
 	mux.HandleFunc("/search/repositories", func(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +62,7 @@ func pageTest(max int, total int, perPage int) *pageTestReulst {
 	})
 
 	// test
-	_, printLastPage, printMax, _ := repo.search.First()
+	_, printLastPage, printMax, _ := repo.search.First(c)
 
 	return &pageTestReulst{
 		printLastPage: printLastPage,
@@ -192,18 +194,19 @@ func TestSearch_Request(t *testing.T) {
 func firstRequestTest(t *testing.T, handler func(http.ResponseWriter, *http.Request)) (*requestTestReulst, error) {
 	Setup()
 	defer Teardown()
+	c := context.Background()
 
 	// create input
 	max := 1000
 	perPage := 100
 	url, _ := url.Parse(server.URL)
-	repo = NewRepo(NewSearch(option(max, perPage, url, "")))
+	repo = NewRepo(NewSearch(c, option(max, perPage, url, "")))
 
 	// create output
 	mux.HandleFunc("/search/repositories", handler)
 
 	// test
-	repos, _, printMax, err := repo.search.First()
+	repos, _, printMax, err := repo.search.First(c)
 
 	return &requestTestReulst{
 		repolen:  len(repos),
@@ -214,18 +217,19 @@ func firstRequestTest(t *testing.T, handler func(http.ResponseWriter, *http.Requ
 func secondRequestTest(t *testing.T, handler func(http.ResponseWriter, *http.Request)) (int, error) {
 	Setup()
 	defer Teardown()
+	c := context.Background()
 
 	// create input
 	max := 1000
 	perPage := 100
 	url, _ := url.Parse(server.URL)
-	repo = NewRepo(NewSearch(option(max, perPage, url, "abcdefg")))
+	repo = NewRepo(NewSearch(c, option(max, perPage, url, "abcdefg")))
 
 	// create output
 	mux.HandleFunc("/search/repositories", handler)
 
 	// test
-	repos, err := repo.search.Exec(2)
+	repos, err := repo.search.Exec(c, 2)
 
 	return len(repos), err
 }

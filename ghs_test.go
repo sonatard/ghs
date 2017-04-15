@@ -145,7 +145,7 @@ func Example_CheckVersion() {
 
 	CheckVersion("0.0.1")
 	// Output:
-	// 0.0.1 is not latest, you should upgrade to 0.0.9
+	// 0.0.1 is not latest, you should upgrade to 0.0.10
 	// -> $ brew update && brew upgrade sona-tar/tools/ghs
 }
 
@@ -182,7 +182,7 @@ func Example_PrintHelp() {
 	//   https://help.github.com/articles/searching-repositories/
 	//
 	// Version:
-	//   ghs 0.0.9 (https://github.com/sona-tar/ghs.git)
+	//   ghs 0.0.10 (https://github.com/sona-tar/ghs.git)
 }
 
 func Example_PrintfDebug() {
